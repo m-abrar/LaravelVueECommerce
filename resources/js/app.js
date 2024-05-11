@@ -1,0 +1,64 @@
+import './bootstrap';
+
+import 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js';
+import 'admin-lte/dist/js/adminlte.min.js';
+import { createApp } from 'vue/dist/vue.esm-bundler.js';
+import { createPinia } from 'pinia';
+import { createRouter, createWebHistory } from 'vue-router';
+import Routes from './routes.js';
+import Login from './pages/auth/Login.vue';
+import App from './App.vue';
+import moment from 'moment';
+
+import { useAuthUserStore } from './stores/AuthUserStore';
+import { useSettingStore } from './stores/SettingStore';
+
+const pinia = createPinia();
+const app = createApp(App);
+
+const router = createRouter({
+    routes: Routes,
+    history: createWebHistory(),
+});
+
+router.beforeEach(async (to, from) => {
+    const authUserStore = useAuthUserStore();
+    if (authUserStore.user.name === '' && to.name !== 'admin.login') {
+        const settingStore = useSettingStore();
+        await Promise.all([
+            authUserStore.getAuthUser(),
+            settingStore.getSetting(),
+        ]);
+    }
+});
+
+app.use(pinia);
+app.use(router);
+
+
+// if (window.location.pathname === '/login') {
+//     const currentApp = createApp({});
+//     currentApp.component('Login', Login);
+//     currentApp.mount('#login');
+// } else {
+//     app.mount('#app');
+// }
+
+
+
+// Define custom filters
+app.config.globalProperties.$filters = {
+    myDate(value) {
+      return moment(value).format('MMMM Do YYYY');
+    },
+    myDate2(value) {
+      return moment(value).format('D MMM, Y');
+    },
+
+    upText(value) {
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    },
+  };
+
+
+app.mount('#app');
