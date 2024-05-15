@@ -152,17 +152,17 @@ const handleFileChange = async (event) => {
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="property-type"
+                                    <label for="product-type"
                                         >Parent Category</label
                                     >
                                     <!-- You can create a select element for categories here -->
                                     <select
-                                        v-model="form.property_type_id"
-                                        id="property-type"
+                                        v-model="form.product_type_id"
+                                        id="product-type"
                                         class="form-control"
                                         :class="{
                                             'is-invalid':
-                                                errors.property_type_id,
+                                                errors.product_type_id,
                                         }"
                                     >
                                         <option value="" disabled>
@@ -178,7 +178,7 @@ const handleFileChange = async (event) => {
                                         </option>
                                     </select>
                                     <span class="invalid-feedback">{{
-                                        errors.property_type_id
+                                        errors.product_type_id
                                     }}</span>
                                 </div>
 
@@ -299,5 +299,5 @@ const handleFileChange = async (event) => {
             </div>
         </div>
     </div>
-    <property-type-form-pictures></property-type-form-pictures>
+    <product-type-form-pictures></product-type-form-pictures>
 </template>

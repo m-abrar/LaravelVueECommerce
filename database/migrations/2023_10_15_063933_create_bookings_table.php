@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('state', 255)->nullable();
             $table->string('zip', 255)->nullable();
             $table->string('country', 255)->nullable();
-            $table->integer('property_id');
+            $table->integer('product_id');
             $table->float('lodging_amount');
             $table->text('sub_total_detail')->nullable();
             $table->float('total_amount')->nullable();

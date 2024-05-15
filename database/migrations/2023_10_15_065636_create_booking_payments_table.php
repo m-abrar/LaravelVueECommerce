@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('booking_payments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('booking_id')->nullable();
-            $table->unsignedBigInteger('property_id')->nullable();
+            $table->unsignedBigInteger('product_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->string('title')->nullable();
             $table->float('amount')->nullable();
@@ -27,7 +27,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('booking_id')->references('id')->on('bookings')->onDelete('set null');
-            $table->foreign('property_id')->references('id')->on('properties')->onDelete('set null');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('set null');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
         
         });

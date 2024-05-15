@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Appointment>
  */
-class PropertiesFactory extends Factory
+class ProductsFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -19,7 +19,7 @@ class PropertiesFactory extends Factory
     public function definition()
     {
         return [
-            'property_type_id' => Categories::factory()->create()->id,
+            'product_type_id' => Categories::factory()->create()->id,
             'name' => $this->faker->sentence(),
             'slug' => $this->faker->sentence(),
             'description' => $this->faker->paragraph(),

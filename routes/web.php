@@ -100,7 +100,7 @@ Route::prefix('/api/category/{category_id}/media')->name('api.category.media.')-
     Route::get('/add-remove/{media_id}', [CategoriesController::class, 'addOrRemoveMedia'])->name('add-remove');
 });
 
-Route::prefix('/api/property/{property_id}/media')->name('api.property.media.')->group(function () {
+Route::prefix('/api/product/{product_id}/media')->name('api.product.media.')->group(function () {
     Route::get('/all', [ProductsController::class, 'getAllMedia'])->name('index');
     Route::get('/featured-update/{media_id}', [ProductsController::class, 'featuredUpdate'])->name('featured-update');
     Route::get('/add-remove/{media_id}', [ProductsController::class, 'addOrRemoveMedia'])->name('add-remove');

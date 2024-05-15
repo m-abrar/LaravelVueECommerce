@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('booking_id')->nullable();
             $table->unsignedBigInteger('line_item_id')->nullable();
-            $table->unsignedBigInteger('property_id')->nullable();
+            $table->unsignedBigInteger('product_id')->nullable();
             $table->string('name')->nullable();
             $table->float('price')->default(0);
             $table->integer('display_order')->nullable();
@@ -25,7 +25,7 @@ return new class extends Migration
 
             $table->foreign('booking_id')->references('id')->on('bookings')->onDelete('set null');
             $table->foreign('line_item_id')->references('id')->on('line_items')->onDelete('set null');
-            $table->foreign('property_id')->references('id')->on('properties')->onDelete('set null');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('set null');
         
         });
     }

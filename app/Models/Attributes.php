@@ -61,6 +61,6 @@ class Attributes extends Model
 
     public function products()
     {
-        return $this->belongsToMany(Products::class, 'property_attribute_pivot', 'attribute_id', 'property_id');
+        return $this->belongsToMany(Products::class, 'product_attribute_pivot', 'attribute_id', 'product_id');
     }
 }

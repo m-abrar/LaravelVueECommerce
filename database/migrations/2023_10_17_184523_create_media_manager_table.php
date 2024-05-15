@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('file_name');
             $table->string('mime_type');
             $table->unsignedBigInteger('size');
-            $table->json('custom_properties')->nullable();
+            $table->json('custom_products')->nullable();
             $table->unsignedBigInteger('model_id')->index();
             $table->string('model_type');
             $table->timestamps();

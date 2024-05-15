@@ -13,9 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('property_neighbours', function (Blueprint $table) {
+        Schema::create('product_neighbours', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('property_id');
+            $table->unsignedBigInteger('product_id');
             $table->string('name')->nullable();
             $table->text('description')->nullable();
             $table->string('icon')->nullable();
@@ -25,9 +25,9 @@ return new class extends Migration
             $table->timestamps();
 
             // Define foreign key constraint
-            $table->foreign('property_id')
+            $table->foreign('product_id')
                 ->references('id')
-                ->on('properties')
+                ->on('products')
                 ->onDelete('cascade');
         });
     }
@@ -39,6 +39,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('property_neighbours');
+        Schema::dropIfExists('product_neighbours');
     }
 };

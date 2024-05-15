@@ -13,14 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('property_feature_pivot', function (Blueprint $table) {
+        Schema::create('product_feature_pivot', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('property_id');
+            $table->unsignedBigInteger('product_id');
             $table->unsignedBigInteger('feature_id');
             $table->timestamps();
 
             // Define foreign key constraints
-            $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreign('feature_id')->references('id')->on('features')->onDelete('cascade');
         });
     }
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('property_feature_pivot');
+        Schema::dropIfExists('product_feature_pivot');
     }
 };

@@ -25,7 +25,7 @@ class CategoriesController extends Controller
             return [
                 'id' => $type->id,
                 'name' => $type->name,
-                'count' => Products::where('property_type_id', $type->id)->count(),
+                'count' => Products::where('product_type_id', $type->id)->count(),
                 'color' => 'success', //Category::from($status->value)->color(),
             ];
         });

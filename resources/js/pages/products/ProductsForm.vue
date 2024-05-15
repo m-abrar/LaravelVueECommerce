@@ -19,7 +19,7 @@ const form = reactive({
     description: "",
     attributes: [],
     price: "",
-    property_type_id: "",
+    product_type_id: "",
     excerpt: "",
     features: [],
     categories: [],
@@ -36,30 +36,30 @@ const form = reactive({
 
 const handleSubmit = (values, actions) => {
     if (editMode.value) {
-        editProperty(values, actions);
+        editProduct(values, actions);
     } else {
-        createProperty(values, actions);
+        createProduct(values, actions);
     }
 };
 
-const createProperty = (values, actions) => {
+const createProduct = (values, actions) => {
     axios
         .post("/api/products/create", form)
         .then((response) => {
             router.push("/admin/products");
-            toastr.success("Property created successfully!");
+            toastr.success("Product created successfully!");
         })
         .catch((error) => {
             actions.setErrors(error.response.data.errors);
         });
 };
 
-const editProperty = (values, actions) => {
+const editProduct = (values, actions) => {
     axios
         .put(`/api/products/${route.params.id}/edit`, form)
         .then((response) => {
             router.push("/admin/products");
-            toastr.success("Property updated successfully!");
+            toastr.success("Product updated successfully!");
         })
         .catch((error) => {
             actions.setErrors(error.response.data.errors);
@@ -95,13 +95,13 @@ const getAvailableFeatures = () => {
 };
 const availableCategories = ref();
 
-const getProperty = () => {
+const getProduct = () => {
     axios.get(`/api/products/${route.params.id}/edit`).then(({ data }) => {
         form.name = data.name;
         form.slug = data.slug;
         form.item_code = data.item_code;
         form.description = data.description;
-        form.property_type_id = data.property_type_id;
+        form.product_type_id = data.product_type_id;
         form.excerpt = data.excerpt;
         form.attributes = data.associated_attributes;
         form.features = data.associated_features;
@@ -123,7 +123,7 @@ const editMode = ref(false);
 onMounted(() => {
     if (route.name === "admin.products.edit") {
         editMode.value = true;
-        getProperty();
+        getProduct();
     }
 
     flatpickr(".flatpickr", {
@@ -173,7 +173,7 @@ onMounted(() => {
                         <div class="card card-success card-outline">
                             <div class="card-header">
                                 <h3 v-if="editMode">Edit: {{ form.name }}</h3>
-                                <h3 v-else>Add New Property</h3>
+                                <h3 v-else>Add New Product</h3>
                             </div>
 
                             <!-- /.card-header -->
@@ -204,11 +204,11 @@ onMounted(() => {
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="name">Property Name</label>
+                                                    <label for="name">Product Name</label>
                                                     <input v-model="form.name" type="text" class="form-control" :class="{
                                                         'is-invalid':
                                                             errors.name,
-                                                    }" id="name" placeholder="Enter Property Name" />
+                                                    }" id="name" placeholder="Enter Product Name" />
                                                     <span class="invalid-feedback">{{ errors.name }}</span>
                                                 </div>
                                             </div>
@@ -358,7 +358,7 @@ onMounted(() => {
                                                         :class="{
                                                             'is-invalid':
                                                                 errors.address,
-                                                        }" id="address" placeholder="Enter Property Address" />
+                                                        }" id="address" placeholder="Enter Product Address" />
                                                     <span class="invalid-feedback">{{
                                                         errors.address
                                                     }}</span>
@@ -372,7 +372,7 @@ onMounted(() => {
                                                         :class="{
                                                             'is-invalid':
                                                                 errors.address,
-                                                        }" id="address" placeholder="Enter Property Address" />
+                                                        }" id="address" placeholder="Enter Product Address" />
                                                     <span class="invalid-feedback">{{
                                                         errors.address
                                                     }}</span>
@@ -386,7 +386,7 @@ onMounted(() => {
                                                         :class="{
                                                             'is-invalid':
                                                                 errors.address,
-                                                        }" id="address" placeholder="Enter Property Address" />
+                                                        }" id="address" placeholder="Enter Product Address" />
                                                     <span class="invalid-feedback">{{
                                                         errors.address
                                                     }}</span>
@@ -394,12 +394,12 @@ onMounted(() => {
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="address">Property Tags</label>
+                                                    <label for="address">Product Tags</label>
                                                     <input v-model="form.address" type="text" class="form-control"
                                                         :class="{
                                                             'is-invalid':
                                                                 errors.address,
-                                                        }" id="address" placeholder="Enter Property Address" />
+                                                        }" id="address" placeholder="Enter Product Address" />
                                                     <span class="invalid-feedback">{{
                                                         errors.address
                                                     }}</span>
@@ -432,7 +432,7 @@ onMounted(() => {
                                                             'is-invalid':
                                                                 errors.description,
                                                         }" id="description" rows="3"
-                                                        placeholder="Enter property description here..."></textarea>
+                                                        placeholder="Enter product description here..."></textarea>
                                                     <span class="invalid-feedback">{{
                                                         errors.description
                                                     }}</span>

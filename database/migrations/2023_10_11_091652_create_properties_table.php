@@ -13,13 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('properties', function (Blueprint $table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('uniqid', 255)->nullable();
             $table->string('item_code', 25)->nullable();
             $table->string('name');
             $table->string('slug', 255)->unique();
-            $table->integer('property_type_id');
+            $table->integer('product_type_id');
             $table->text('excerpt')->nullable();
             $table->blob('description')->nullable();
             $table->decimal('price', 10, 2)->nullable();
@@ -73,6 +73,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('properties');
+        Schema::dropIfExists('products');
     }
 };

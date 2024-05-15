@@ -36,7 +36,7 @@ const updateCategoriesCount = (id) => {
     statusToUpdate.count--;
 };
 
-const deleteProperty = (id) => {
+const deleteProduct = (id) => {
     Swal.fire({
         title: 'Are you sure?',
         text: "You won't be able to revert this!",
@@ -89,7 +89,7 @@ onMounted(() => {
                     <div class="d-flex justify-content-between mb-2">
                         <div>
                             <router-link to="/admin/products/create">
-                                <button class="btn btn-primary"><i class="fa fa-plus-circle mr-1"></i> Add New Property</button>
+                                <button class="btn btn-primary"><i class="fa fa-plus-circle mr-1"></i> Add New Product</button>
                             </router-link>
                         </div>
                         <div class="btn-group">
@@ -118,21 +118,21 @@ onMounted(() => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(property, index) in productsList.data" :key="property.id">
+                                    <tr v-for="(product, index) in productsList.data" :key="product.id">
                                         <td>{{ index + 1 }}</td>
-                                        <td>{{ property.name }}</td>
-                                        <td>{{ property.type.name }}</td>
-                                        <td>{{ property.item_code }}</td>
+                                        <td>{{ product.name }}</td>
+                                        <td>{{ product.type.name }}</td>
+                                        <td>{{ product.item_code }}</td>
                                         <!-- <td>
                                             <span class="badge" :class="`badge-${products.status.color}`">{{
                                                 products.status.name }}</span>
                                         </td> -->
                                         <td>
-                                            <router-link :to="`/admin/products/${property.id}/edit`">
+                                            <router-link :to="`/admin/products/${product.id}/edit`">
                                                 <i class="fa fa-edit mr-2"></i>
                                             </router-link>
 
-                                            <a href="#" @click.prevent="deleteProducts(property.id)">
+                                            <a href="#" @click.prevent="deleteProducts(product.id)">
                                                 <i class="fa fa-trash text-danger"></i>
                                             </a>
                                         </td>

@@ -13,9 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('property_services', function (Blueprint $table) {
+        Schema::create('product_services', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('property_id'); // Foreign key reference
+            $table->unsignedBigInteger('product_id'); // Foreign key reference
             $table->string('name')->nullable();
             $table->string('icon')->nullable();
             $table->string('image')->nullable();
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('property_services');
+        Schema::dropIfExists('product_services');
     }
 };

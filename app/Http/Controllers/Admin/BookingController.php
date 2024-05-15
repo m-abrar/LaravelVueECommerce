@@ -31,7 +31,7 @@ class BookingController extends Controller
         // Validate the specific fields
         $request->validate($validationRules);
         // Update the model with all form fields
-        $booking->update($request->except(['property','lineitems','services','payments']));
+        $booking->update($request->except(['product','lineitems','services','payments']));
 
         // Use the sync method to update the selected attributes
         $booking->attributes()->sync($request->input('attributes', []));
@@ -44,7 +44,7 @@ class BookingController extends Controller
             // Create and associate line items
             $lineItems = [];
             foreach ($request['lineitems'] as $lineitem) {
-                $lineItems[] = new PropertyLineItem([
+                $lineItems[] = new ProductLineItem([
                     'name' => $lineitem['name'],
                     'value' => $lineitem['value'],
                     'value_type' => $lineitem['value_type'],
@@ -55,7 +55,7 @@ class BookingController extends Controller
                 ]);
             }
 
-            $property->lineitems()->saveMany($lineItems);
+            $product->lineitems()->saveMany($lineItems);
         }
 
         return response()->json(['message' => 'success']);
@@ -63,7 +63,7 @@ class BookingController extends Controller
 
     public function edit(Booking $booking)
     {
-        $booking->load('lineitems')->load('services')->load('payments')->load('property');
+        $booking->load('lineitems')->load('services')->load('payments')->load('product');
 
         return $booking;
     }
@@ -82,10 +82,10 @@ class BookingController extends Controller
         $request->validate($validationRules);
 
         // Update the model with all form fields
-        $booking->update($request->except(['property','lineitems','services','payments']));
+        $booking->update($request->except(['product','lineitems','services','payments']));
 
         if (isset($request['lineitems'])) {
-            // Delete existing line items for the property
+            // Delete existing line items for the product
             $booking->lineitems()->delete();
         
             // Create and associate new line items
@@ -107,7 +107,7 @@ class BookingController extends Controller
 
 
         if (isset($request['services'])) {
-            // Delete existing services for the property
+            // Delete existing services for the product
             $booking->services()->delete();
         
             // Create and associate new services

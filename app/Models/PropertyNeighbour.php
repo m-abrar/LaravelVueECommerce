@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 
-class PropertyNeighbour extends Model
+class ProductNeighbour extends Model
 {
     use HasFactory;
 
@@ -58,9 +58,9 @@ class PropertyNeighbour extends Model
         );
     }
 
-    public function property()
+    public function product()
     {
-        return $this->belongsTo(Products::class, 'property_id');
+        return $this->belongsTo(Products::class, 'product_id');
     }
 
 }

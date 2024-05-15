@@ -61,6 +61,6 @@ class Service extends Model
 
     public function products()
     {
-        return $this->belongsToMany(Products::class, 'property_feature_pivot', 'feature_id', 'property_id');
+        return $this->belongsToMany(Products::class, 'product_feature_pivot', 'feature_id', 'product_id');
     }
 }

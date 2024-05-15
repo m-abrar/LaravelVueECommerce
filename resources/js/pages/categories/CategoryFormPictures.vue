@@ -167,7 +167,7 @@ export default {
           attachmentIDs.value = response.data.attachmentIDs;
         })
         .catch((error) => {
-          console.error('Error fetching property images:', error);
+          console.error('Error fetching product images:', error);
         });
     };
 

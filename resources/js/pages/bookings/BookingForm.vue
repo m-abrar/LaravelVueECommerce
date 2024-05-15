@@ -70,7 +70,7 @@ const form = reactive({
     state: '',
     zip: '',
     country: '',
-    property_id: null,
+    product_id: null,
     lodging_amount: null,
     sub_total_detail: '',
     total_amount: null,
@@ -80,7 +80,7 @@ const form = reactive({
     created_by: '',
     housekeeper_id: null,
     notes: '',
-    property: [],
+    product: [],
     lineitems: [],
     services: [],
     payments: [],
@@ -137,7 +137,7 @@ const getBooking = () => {
             form.state = data.state;
             form.zip = data.zip;
             form.country = data.country;
-            form.property_id = data.property_id;
+            form.product_id = data.product_id;
             form.lodging_amount = data.lodging_amount;
             form.sub_total_detail = data.sub_total_detail;
             form.total_amount = data.total_amount;
@@ -147,7 +147,7 @@ const getBooking = () => {
             form.created_by = data.created_by;
             form.housekeeper_id = data.housekeeper_id;
             form.notes = data.notes;
-            form.property = data.property;
+            form.product = data.product;
             form.lineitems = data.lineitems;
             form.services = data.services;
             form.payments = data.payments;
@@ -271,8 +271,8 @@ onMounted(() => {
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label>Property: </label>
-                                                    {{ form.property.name }}
+                                                    <label>Product: </label>
+                                                    {{ form.product.name }}
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Reservation ID#: </label>

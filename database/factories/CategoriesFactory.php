@@ -19,7 +19,7 @@ class CategoriesFactory extends Factory
     public function definition()
     {
         return [
-            // 'property_type_id' => Categories::factory()->create()->id,
+            // 'product_type_id' => Categories::factory()->create()->id,
             'name' => $this->faker->sentence(),
             'description' => $this->faker->paragraph(),
             // 'status' => rand(1, 3),

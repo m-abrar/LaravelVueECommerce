@@ -58,9 +58,9 @@ class BookingService extends Model
         );
     }
 
-    public function property()
+    public function product()
     {
-        return $this->belongsTo(Products::class, 'property_id');
+        return $this->belongsTo(Products::class, 'product_id');
     }
 
 }

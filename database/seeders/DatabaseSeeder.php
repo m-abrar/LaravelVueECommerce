@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // \App\Models\User::factory(10)->create();
-        // \App\Models\Properties::factory(10)->create();
+        // \App\Models\Products::factory(10)->create();
         // \App\Models\Attributes::factory(10)->create();
         // \App\Models\Features::factory(10)->create();
         // \App\Models\Service::factory(10)->create();
@@ -29,16 +29,16 @@ class DatabaseSeeder extends Seeder
         // ]);
 
 
-        // $properties = \App\Models\Properties::all();
+        // $products = \App\Models\Products::all();
         // $attributes = \App\Models\Attributes::all();
 
-        // // Loop through properties and associate them with random attributes
-        // $properties->each(function ($property) use ($attributes) {
-        //     // Randomly select a subset of attributes to associate with the property
+        // // Loop through products and associate them with random attributes
+        // $products->each(function ($product) use ($attributes) {
+        //     // Randomly select a subset of attributes to associate with the product
         //     $associatedAttributes = $attributes->random(rand(1, 5)); // Associate with 1 to 5 random attributes
 
-        //     // Sync the property's attributes, replacing existing associations
-        //     $property->attributes()->sync($associatedAttributes);
+        //     // Sync the product's attributes, replacing existing associations
+        //     $product->attributes()->sync($associatedAttributes);
         // });
 
 
