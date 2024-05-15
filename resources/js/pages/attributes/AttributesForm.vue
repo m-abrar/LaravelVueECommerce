@@ -4,7 +4,7 @@ import { reactive, onMounted, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useToastr } from '@/toastr';
 import { Form } from 'vee-validate';
-import AmenitiesFormPictures from "./AmenitiesFormPictures.vue"; // Import the child component
+import AttributesFormPictures from "./AttributesFormPictures.vue"; // Import the child component
 
 const router = useRouter();
 const route = useRoute();
@@ -24,10 +24,10 @@ const handleSubmit = (values, actions) => {
 };
 
 const createCategory = (values, actions) => {
-    axios.post('/api/amenities/create', form)
+    axios.post('/api/attributes/create', form)
         .then((response) => {
-            router.push('/admin/amenities');
-            toastr.success('Amenity created successfully!');
+            router.push('/admin/attributes');
+            toastr.success('Attribute created successfully!');
         })
         .catch((error) => {
             actions.setErrors(error.response.data.errors);
@@ -35,10 +35,10 @@ const createCategory = (values, actions) => {
 };
 
 const editCategory = (values, actions) => {
-    axios.put(`/api/amenities/${route.params.id}/edit`, form)
+    axios.put(`/api/attributes/${route.params.id}/edit`, form)
         .then((response) => {
-            router.push('/admin/amenities');
-            toastr.success('Amenity updated successfully!');
+            router.push('/admin/attributes');
+            toastr.success('Attribute updated successfully!');
         })
         .catch((error) => {
             actions.setErrors(error.response.data.errors);
@@ -47,7 +47,7 @@ const editCategory = (values, actions) => {
 
 
 const getCategory = () => {
-    axios.get(`/api/amenities/${route.params.id}/edit`)
+    axios.get(`/api/attributes/${route.params.id}/edit`)
         .then(({ data }) => {
             console.log(data);
             form.id = data.id;
@@ -62,7 +62,7 @@ const getCategory = () => {
 const editMode = ref(false);
 
 onMounted(() => {
-    if (route.name === 'admin.amenities.edit') {
+    if (route.name === 'admin.attributes.edit') {
         editMode.value = true;
         getCategory();
     }
@@ -85,7 +85,7 @@ const handleFileChange = async (event) => {
     formData.append('id', form.id);
 
     // Send the FormData to your server for processing
-    axios.post('/api/amenities/upload-image', formData)
+    axios.post('/api/attributes/upload-image', formData)
         .then((response) => {
             console.log(response);
             form.image_created = response.data.image_created;
@@ -106,7 +106,7 @@ const handleFileChange = async (event) => {
                     <h1 class="m-0">
                         <span v-if="editMode">Edit</span>
                         <span v-else>Create</span>
-                        Amenity
+                        Attribute
                     </h1>
                 </div>
                 <div class="col-sm-6">
@@ -115,7 +115,7 @@ const handleFileChange = async (event) => {
                             <router-link to="/admin/dashboard">Home</router-link>
                         </li>
                         <li class="breadcrumb-item">
-                            <router-link to="/admin/amenities">Amenity</router-link>
+                            <router-link to="/admin/attributes">Attribute</router-link>
                         </li>
                         <li class="breadcrumb-item active">
                             <span v-if="editMode">Edit</span>
@@ -156,5 +156,5 @@ const handleFileChange = async (event) => {
             </div>
         </div>
     </div>
-    <amenities-form-pictures></amenities-form-pictures>
+    <attributes-form-pictures></attributes-form-pictures>
 </template>

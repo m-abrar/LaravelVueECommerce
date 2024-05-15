@@ -1,32 +1,31 @@
 <template>
     <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Amenities</h1>
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Amenities</li>
-            </ol>
-          </div>
+        <div class="container-fluid">
+            <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Categories</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active">Categories</li>
+                </ol>
+            </div>
+            </div>
         </div>
-      </div>
     </div>
+
     <div class="content">
       <div class="container-fluid">
         <div class="row">
           <div class="col-lg-12">
-            <!-- Add New Amenity Button -->
             <div class="d-flex justify-content-between mb-2">
               <div>
-                <router-link to="/admin/amenities/create">
-                  <button class="btn btn-primary"><i class="fa fa-plus-circle mr-1"></i> Add New Amenity</button>
+                <router-link to="/admin/categories/create">
+                  <button class="btn btn-primary"><i class="fa fa-plus-circle mr-1"></i> Add New Category</button>
                 </router-link>
               </div>
             </div>
-            <!-- Amenities Table -->
             <div class="card">
               <div class="card-body">
                 <table class="table table-bordered">
@@ -38,16 +37,14 @@
                     </tr>
                   </thead>
                   <tbody ref="sortableList">
-                    <tr v-for="(amenity, index) in amenities" :key="amenity.id">
+                    <tr v-for="(category, index) in categories" :key="category.id">
                       <td>{{ index + 1 }}</td>
-                      <td>{{ amenity.name }}</td>
+                      <td>{{ category.name }}</td>
                       <td>
-                        <!-- Edit Amenity Link -->
-                        <router-link :to="`/admin/amenities/${amenity.id}/edit`">
+                        <router-link :to="`/admin/categories/${category.id}/edit`">
                           <i class="fa fa-edit mr-2"></i>
                         </router-link>
-                        <!-- Delete Amenity Button -->
-                        <a href="#" @click.prevent="deleteAmenity(amenity.id)">
+                        <a href="#" @click.prevent="deleteCategory(category.id)">
                           <i class="fa fa-trash text-danger"></i>
                         </a>
                       </td>
@@ -65,20 +62,20 @@
   <script setup>
   import { ref, onMounted } from 'vue';
   import Sortable from 'sortablejs';
-  import axios from 'axios';
   import Swal from 'sweetalert2';
+  import axios from 'axios';
   
   const sortableList = ref(null);
-  const amenities = ref([]);
+  const categories = ref([]);
   
-  const fetchAmenities = () => {
-    axios.get('/api/amenities')
+  const getCategories = () => {
+    axios.get('/api/categories')
       .then(response => {
-        amenities.value = response.data;
+        categories.value = response.data;
         initSortable();
       })
       .catch(error => {
-        console.error('Error fetching amenities:', error);
+        console.error('Error fetching categories:', error);
       });
   };
   
@@ -92,25 +89,25 @@
     }
   };
   
-
-    const handleSortEnd = evt => {
-    const movedAmenity = amenities.value.splice(evt.oldIndex, 1)[0];
-    amenities.value.splice(evt.newIndex, 0, movedAmenity);
-
+  const handleSortEnd = evt => {
+    // Reorder the categories
+    const movedCategory = categories.value.splice(evt.oldIndex, 1)[0];
+    categories.value.splice(evt.newIndex, 0, movedCategory);
+  
     // Extract IDs in the new order
-    const idsInNewOrder = amenities.value.map(amenity => amenity.id);
-
+    const idsInNewOrder = categories.value.map(category => category.id);
+  
     // Send the updated order to the backend
-    axios.post('/api/amenities/update-sort-order', { ids: idsInNewOrder })
-        .then(response => {
+    axios.post('/api/categories/update-sort-order', { ids: idsInNewOrder })
+      .then(response => {
         console.log(response.data.message); // Log success message
-        })
-        .catch(error => {
+      })
+      .catch(error => {
         console.error('Error updating sort order:', error); // Log error
-        });
-    };
-
-  const deleteAmenity = id => {
+      });
+  };
+  
+  const deleteCategory = id => {
     Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -121,21 +118,21 @@
       confirmButtonText: 'Yes, delete it!'
     }).then(result => {
       if (result.isConfirmed) {
-        axios.delete(`/api/amenities/${id}`)
+        axios.delete(`/api/categories/${id}`)
           .then(() => {
-            amenities.value = amenities.value.filter(amenity => amenity.id !== id);
-            Swal.fire('Deleted!', 'Your amenity has been deleted.', 'success');
+            categories.value = categories.value.filter(category => category.id !== id);
+            Swal.fire('Deleted!', 'Your category has been deleted.', 'success');
           })
           .catch(error => {
-            Swal.fire('Error!', 'Failed to delete amenity.', 'error');
-            console.error('Error deleting amenity:', error);
+            Swal.fire('Error!', 'Failed to delete category.', 'error');
+            console.error('Error deleting category:', error);
           });
       }
     });
   };
   
   onMounted(() => {
-    fetchAmenities();
+    getCategories();
   });
   </script>
   

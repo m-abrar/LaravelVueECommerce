@@ -4,35 +4,35 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 
 const selectedType = ref();
-const propertyTypes = ref([]);
-const propertiesList = ref([]);
+const categories = ref([]);
+const productsList = ref([]);
 
-const getPropertyTypes = () => {
-    axios.get('/api/propertytypes/withcount')
+const getCategories = () => {
+    axios.get('/api/categories/withcount')
         .then((response) => {
-            propertyTypes.value = response.data;
+            categories.value = response.data;
         })
 };
-const getProperties = (type) => {
+const getProducts = (type) => {
     selectedType.value = type;
     const params = {};
     if (type) {
         params.type = type;
     }
-    axios.get('/api/properties', {
+    axios.get('/api/products', {
         params: params,
     })
         .then((response) => {
-            propertiesList.value = response.data;
+            productsList.value = response.data;
         })
 };
-const propertiesCount = computed(() => {
-    return propertyTypes.value.map(status => status.count).reduce((acc, value) => acc + value, 0);
+const productsCount = computed(() => {
+    return categories.value.map(status => status.count).reduce((acc, value) => acc + value, 0);
 });
 
-const updatePropertyTypesCount = (id) => {
-    const deletedPropertyType = propertiesList.value.data.find(propertiesList => propertiesList.id === id).status.name;
-    const statusToUpdate = propertyStatus.value.find(status => status.name === deletedPropertyStatus);
+const updateCategoriesCount = (id) => {
+    const deletedCategory = productsList.value.data.find(productsList => productsList.id === id).status.name;
+    const statusToUpdate = productstatus.value.find(status => status.name === deletedProductstatus);
     statusToUpdate.count--;
 };
 
@@ -47,10 +47,10 @@ const deleteProperty = (id) => {
         confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
         if (result.isConfirmed) {
-            axios.delete(`/api/properties/${id}`)
+            axios.delete(`/api/products/${id}`)
                 .then((response) => {
-                    updatePropertyTypesCount(id);
-                    propertiesList.value.data = propertiesList.value.data.filter(propertiesList => propertiesList.id !== id);
+                    updateCategoriesCount(id);
+                    productsList.value.data = productsList.value.data.filter(productsList => productsList.id !== id);
                     Swal.fire(
                         'Deleted!',
                         'Your file has been deleted.',
@@ -62,8 +62,8 @@ const deleteProperty = (id) => {
 };
 
 onMounted(() => {
-    getProperties();
-    getPropertyTypes();
+    getProducts();
+    getCategories();
 });
 </script>
 <template>
@@ -88,17 +88,17 @@ onMounted(() => {
                 <div class="col-lg-12">
                     <div class="d-flex justify-content-between mb-2">
                         <div>
-                            <router-link to="/admin/properties/create">
-                                <button class="btn btn-primary"><i class="fa fa-plus-circle mr-1"></i> Add New Product</button>
+                            <router-link to="/admin/products/create">
+                                <button class="btn btn-primary"><i class="fa fa-plus-circle mr-1"></i> Add New Property</button>
                             </router-link>
                         </div>
                         <div class="btn-group">
-                            <button @click="getProperties()" type="button" class="btn"
+                            <button @click="getProducts()" type="button" class="btn"
                                 :class="[typeof selectedType === 'undefined' ? 'btn-secondary' : 'btn-default']">
                                 <span class="mr-1">All</span>
-                                <span class="badge badge-pill badge-info">{{ propertiesCount }}</span>
+                                <span class="badge badge-pill badge-info">{{ productsCount }}</span>
                             </button>
-                            <button v-for="type in propertyTypes" @click="getProperties(type.id)" type="button"
+                            <button v-for="type in categories" @click="getProducts(type.id)" type="button"
                                 :class="[selectedType === type.id ? 'btn btn-secondary' : 'btn btn-default']">
                                 <span class="mr-1">{{ type.name }}</span>
                                 <span class="badge badge-pill" :class="`badge-${type.color}`">{{ type.count }}</span>
@@ -118,21 +118,21 @@ onMounted(() => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(property, index) in propertiesList.data" :key="property.id">
+                                    <tr v-for="(property, index) in productsList.data" :key="property.id">
                                         <td>{{ index + 1 }}</td>
                                         <td>{{ property.name }}</td>
                                         <td>{{ property.type.name }}</td>
                                         <td>{{ property.item_code }}</td>
                                         <!-- <td>
-                                            <span class="badge" :class="`badge-${properties.status.color}`">{{
-                                                properties.status.name }}</span>
+                                            <span class="badge" :class="`badge-${products.status.color}`">{{
+                                                products.status.name }}</span>
                                         </td> -->
                                         <td>
-                                            <router-link :to="`/admin/properties/${property.id}/edit`">
+                                            <router-link :to="`/admin/products/${property.id}/edit`">
                                                 <i class="fa fa-edit mr-2"></i>
                                             </router-link>
 
-                                            <a href="#" @click.prevent="deleteProperties(property.id)">
+                                            <a href="#" @click.prevent="deleteProducts(property.id)">
                                                 <i class="fa fa-trash text-danger"></i>
                                             </a>
                                         </td>

@@ -6,7 +6,7 @@ import { useToastr } from "@/toastr";
 import { Form } from "vee-validate";
 import flatpickr from "flatpickr";
 import "flatpickr/dist/themes/light.css";
-import PropertiesFormPictures from "./PropertiesFormPictures.vue"; // Import the child component
+import ProductsFormPictures from "./ProductsFormPictures.vue"; // Import the child component
 
 const router = useRouter();
 const route = useRoute();
@@ -17,7 +17,7 @@ const form = reactive({
     slug: "",
     item_code: "",
     description: "",
-    amenities: [],
+    attributes: [],
     price: "",
     property_type_id: "",
     excerpt: "",
@@ -44,10 +44,10 @@ const handleSubmit = (values, actions) => {
 
 const createProperty = (values, actions) => {
     axios
-        .post("/api/properties/create", form)
+        .post("/api/products/create", form)
         .then((response) => {
-            router.push("/admin/properties");
-            toastr.success("Product created successfully!");
+            router.push("/admin/products");
+            toastr.success("Property created successfully!");
         })
         .catch((error) => {
             actions.setErrors(error.response.data.errors);
@@ -56,20 +56,21 @@ const createProperty = (values, actions) => {
 
 const editProperty = (values, actions) => {
     axios
-        .put(`/api/properties/${route.params.id}/edit`, form)
+        .put(`/api/products/${route.params.id}/edit`, form)
         .then((response) => {
-            router.push("/admin/properties");
-            toastr.success("Product updated successfully!");
+            router.push("/admin/products");
+            toastr.success("Property updated successfully!");
         })
         .catch((error) => {
             actions.setErrors(error.response.data.errors);
         });
 };
 
-const propertyTypes = ref();
-const getAvailablePropertyTypes = () => {
-    axios.get("/api/propertytypes").then((response) => {
-        propertyTypes.value = response.data;
+const categories = ref();
+
+const getAvailableCategories = () => {
+    axios.get("/api/categories").then((response) => {
+        availableCategories.value = response.data;
     });
 };
 
@@ -80,10 +81,10 @@ const getAvailableLocations = () => {
     });
 };
 
-const availableAmenities = ref();
-const getAvailableAmenities = () => {
-    axios.get("/api/amenities").then((response) => {
-        availableAmenities.value = response.data;
+const availableAttributes = ref();
+const getAvailableAttributes = () => {
+    axios.get("/api/attributes").then((response) => {
+        availableAttributes.value = response.data;
     });
 };
 const availableFeatures = ref();
@@ -93,21 +94,16 @@ const getAvailableFeatures = () => {
     });
 };
 const availableCategories = ref();
-const getAvailableCategories = () => {
-    axios.get("/api/propertytypes").then((response) => {
-        availableCategories.value = response.data;
-    });
-};
 
 const getProperty = () => {
-    axios.get(`/api/properties/${route.params.id}/edit`).then(({ data }) => {
+    axios.get(`/api/products/${route.params.id}/edit`).then(({ data }) => {
         form.name = data.name;
         form.slug = data.slug;
         form.item_code = data.item_code;
         form.description = data.description;
         form.property_type_id = data.property_type_id;
         form.excerpt = data.excerpt;
-        form.amenities = data.associated_amenities;
+        form.attributes = data.associated_attributes;
         form.features = data.associated_features;
         form.categories = data.associated_categories;
         form.image = data.image;
@@ -125,7 +121,7 @@ const getProperty = () => {
 const editMode = ref(false);
 
 onMounted(() => {
-    if (route.name === "admin.properties.edit") {
+    if (route.name === "admin.products.edit") {
         editMode.value = true;
         getProperty();
     }
@@ -135,9 +131,8 @@ onMounted(() => {
         dateFormat: "Y-m-d h:i K",
         defaultHour: 10,
     });
-    getAvailablePropertyTypes();
     getAvailableLocations();
-    getAvailableAmenities();
+    getAvailableAttributes();
     getAvailableFeatures();
     getAvailableCategories();
 });
@@ -148,7 +143,7 @@ onMounted(() => {
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <router-link :to="{ name: 'admin.properties' }" class="btn btn-outline-primary">
+                    <router-link :to="{ name: 'admin.products' }" class="btn btn-outline-primary">
                         <i class="fas fa-list"></i> All Products
                     </router-link>
                 </div>
@@ -158,7 +153,7 @@ onMounted(() => {
                             <router-link to="/admin/dashboard">Home</router-link>
                         </li>
                         <li class="breadcrumb-item">
-                            <router-link to="/admin/properties">Products</router-link>
+                            <router-link to="/admin/products">Products</router-link>
                         </li>
                         <li class="breadcrumb-item active">
                             <span v-if="editMode">Edit</span>
@@ -178,7 +173,7 @@ onMounted(() => {
                         <div class="card card-success card-outline">
                             <div class="card-header">
                                 <h3 v-if="editMode">Edit: {{ form.name }}</h3>
-                                <h3 v-else>Add New Product</h3>
+                                <h3 v-else>Add New Property</h3>
                             </div>
 
                             <!-- /.card-header -->
@@ -209,11 +204,11 @@ onMounted(() => {
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="name">Product Name</label>
+                                                    <label for="name">Property Name</label>
                                                     <input v-model="form.name" type="text" class="form-control" :class="{
                                                         'is-invalid':
                                                             errors.name,
-                                                    }" id="name" placeholder="Enter Product Name" />
+                                                    }" id="name" placeholder="Enter Property Name" />
                                                     <span class="invalid-feedback">{{ errors.name }}</span>
                                                 </div>
                                             </div>
@@ -399,7 +394,7 @@ onMounted(() => {
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="address">Product Tags</label>
+                                                    <label for="address">Property Tags</label>
                                                     <input v-model="form.address" type="text" class="form-control"
                                                         :class="{
                                                             'is-invalid':
@@ -466,19 +461,19 @@ onMounted(() => {
                                         </div>
                                     </div>
                                     <!-- Tab Pan-->
-                                    <div class="tab-pane" id="amenities">
-                                        <h3 class="text-center">Amenities</h3>
+                                    <div class="tab-pane" id="attributes">
+                                        <h3 class="text-center">Attributes</h3>
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <div class="form-group">
-                                                    <!-- Iterate through available amenities -->
+                                                    <!-- Iterate through available attributes -->
                                                     <div class="checkbox-item col-lg-3 col-md-4 col-sm-6 col-sm-12"
-                                                        v-for="amenity in availableAmenities" :key="amenity.id">
+                                                        v-for="attribute in availableAttributes" :key="attribute.id">
                                                         <label class="checkbox-label">
-                                                            <input type="checkbox" v-model="form.amenities
-                                                                " :value="amenity.id
-                                                                    " name="amenities[]" />
-                                                            {{ amenity.name }}
+                                                            <input type="checkbox" v-model="form.attributes
+                                                                " :value="attribute.id
+                                                                    " name="attributes[]" />
+                                                            {{ attribute.name }}
                                                         </label>
                                                     </div>
                                                 </div>
@@ -501,7 +496,7 @@ onMounted(() => {
             </div>
         </div>
     </div>
-    <properties-form-pictures></properties-form-pictures>
+    <products-form-pictures></products-form-pictures>
 </template>
 
 <style scoped>

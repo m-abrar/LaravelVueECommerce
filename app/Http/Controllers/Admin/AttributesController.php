@@ -2,38 +2,35 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Features;
+use App\Models\Attributes;
 use App\Http\Controllers\Controller;
 use App\Models\Products;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class FeaturesController extends Controller
+class AttributesController extends Controller
 {
     public function index()
     {
-        return Features::all();
+        // return Attributes::all();
+        return Attributes::orderBy('sort_order')->get();
     }
 
-    
-    
-    public function getAllMedia($feature_id)
-    {
-        $feature = Features::findOrFail($feature_id);
 
-        $featuredMediaFile = $feature->mediaFiles()
+    public function getAllMedia($attribute_id)
+    {
+        $attribute = Attributes::findOrFail($attribute_id);
+
+        $featuredMediaFile = $attribute->mediaFiles()
             ->wherePivot('is_featured', true)
             ->latest()
             ->first();
         if ($featuredMediaFile) {
-            // Check if $featuredMediaFile is not null
             $featuredMediaFile->url = $featuredMediaFile->getUrl();
         }
 
-        // Retrieve all media for the feature
-        $mediaFiles = $feature->mediaFiles()->orderBy('display_order', 'ASC')->get();
+        $mediaFiles = $attribute->mediaFiles()->orderBy('display_order', 'ASC')->get();
 
-        // Iterate through media files and set URLs
         $mediaFiles->each(function ($mediaItem) {
             $mediaItem->url = $mediaItem->getUrl();
         });
@@ -47,40 +44,36 @@ class FeaturesController extends Controller
         ];
     }
 
-    public function featuredUpdate($feature_id, $media_id)
+    public function featuredUpdate($attribute_id, $media_id)
     {
-        $feature = Features::findOrFail($feature_id);
+        $attribute = Attributes::findOrFail($attribute_id);
 
-        $mediaIds = $feature->mediaFiles()->pluck('media_id')->toArray();
+        $mediaIds = $attribute->mediaFiles()->pluck('media_id')->toArray();
 
         foreach ($mediaIds as $mediaId) {
-            $feature->mediaFiles()->updateExistingPivot($mediaId, ['is_featured' => false]);
+            $attribute->mediaFiles()->updateExistingPivot($mediaId, ['is_featured' => false]);
         }
 
-        $response = $feature->mediaFiles()->updateExistingPivot($media_id, ['is_featured' => true]);
+        $response = $attribute->mediaFiles()->updateExistingPivot($media_id, ['is_featured' => true]);
 
         return $response;
     }
 
-    public function addOrRemoveMedia($feature_id, $media_id)
+    public function addOrRemoveMedia($attribute_id, $media_id)
     {
-        $feature = Features::findOrFail($feature_id);
+        $attribute = Attributes::findOrFail($attribute_id);
 
-        $existingMedia = $feature->mediaFiles()->find($media_id);
+        $existingMedia = $attribute->mediaFiles()->find($media_id);
 
         if ($existingMedia) {
-            // The media_id is already attached, so detach it
-            $response = $feature->mediaFiles()->detach($media_id, ['model_type' => get_class($feature)]);
+            $response = $attribute->mediaFiles()->detach($media_id, ['model_type' => get_class($attribute)]);
             return 'removed';
         } else {
-            // The media_id is not attached, so attach it
-            $response = $feature->mediaFiles()->attach($media_id, ['model_type' => get_class($feature)]);
+            $response = $attribute->mediaFiles()->attach($media_id, ['model_type' => get_class($attribute)]);
             return 'attached';
         }
     }
 
-    
-    
 
     public function store(Request $request)
     {
@@ -88,7 +81,7 @@ class FeaturesController extends Controller
             'name' => 'required',
         ]);
 
-        Features::create([
+        Attributes::create([
             'name' => $validated['name'],
             'description' => $request->description,
             'image' => $request->image_created,
@@ -96,18 +89,18 @@ class FeaturesController extends Controller
         return response()->json(['message' => 'success']);
     }
 
-    public function edit($id)
+    public function edit(Attributes $attributes)
     {
-        return Features::findOrFail($id);
+        return $attributes;
     }
 
-    public function update(Request $request, Features $features)
+    public function update(Request $request, Attributes $attributes)
     {
         $validated = request()->validate([
             'name' => 'required',
         ]);
 
-        $features->update([
+        $attributes->update([
             'name' => $validated['name'],
             'description' => $request->description,
         ]);
@@ -130,17 +123,29 @@ class FeaturesController extends Controller
             // Store the image in the 'public' disk under the 'images' directory
             // // Storage::disk('public')->put('images/' . $filename, file_get_contents($file));
             // You can save the image file path in your database if needed
-            Features::where('id', $request->id)->update(['image' => $link]);
+            Attributes::where('id', $request->id)->update(['image' => $link]);
             return response()->json(['success' => true, 'image_created' => $link]);
         } else {
             return response()->json(['success' => false, 'message' => 'No file uploaded.']);
         }
     }
 
-    public function destroy(Features $features)
+    public function destroy(Attributes $attributes)
     {
-        $features->delete();
+        $attributes->delete();
 
         return response()->json(['success' => true], 200);
+    }
+
+
+    public function updateSortOrder(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        foreach ($ids as $index => $id) {
+            Attributes::where('id', $id)->update(['sort_order' => $index + 1]);
+        }
+
+        return response()->json(['message' => 'Sort order updated successfully']);
     }
 }

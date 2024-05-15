@@ -2,22 +2,22 @@
 
 use Illuminate\Database\Seeder;
 use App\Models\Property;
-use App\Models\Amenity;
+use App\Models\Attribute;
 
-class PropertyAmenityTableSeeder extends Seeder
+class PropertyAttributeTableSeeder extends Seeder
 {
     public function run()
     {
         $properties = Property::all();
-        $amenities = Amenity::all();
+        $attributes = Attribute::all();
 
-        // // Loop through properties and associate them with random amenities
-        // $properties->each(function ($property) use ($amenities) {
-        //     // Randomly select a subset of amenities to associate with the property
-        //     $associatedAmenities = $amenities->random(rand(1, 5)); // Associate with 1 to 5 random amenities
+        // // Loop through properties and associate them with random attributes
+        // $properties->each(function ($property) use ($attributes) {
+        //     // Randomly select a subset of attributes to associate with the property
+        //     $associatedAttributes = $attributes->random(rand(1, 5)); // Associate with 1 to 5 random attributes
 
-        //     // Sync the property's amenities, replacing existing associations
-        //     $property->amenities()->sync($associatedAmenities);
+        //     // Sync the property's attributes, replacing existing associations
+        //     $property->attributes()->sync($associatedAttributes);
         // });
     }
 }

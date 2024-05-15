@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Slider;
 use App\Http\Controllers\Controller;
-use App\Models\Properties;
+use App\Models\Products;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,7 +12,8 @@ class SlidersController extends Controller
 {
     public function index()
     {
-        return Slider::all();
+        // return Slider::all();
+        return Slider::orderBy('sort_order')->get();
     }
 
 
@@ -135,5 +136,16 @@ class SlidersController extends Controller
         $sliders->delete();
 
         return response()->json(['success' => true], 200);
+    }
+
+    public function updateSortOrder(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        foreach ($ids as $index => $id) {
+            Slider::where('id', $id)->update(['sort_order' => $index + 1]);
+        }
+
+        return response()->json(['message' => 'Sort order updated successfully']);
     }
 }

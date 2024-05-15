@@ -69,8 +69,8 @@ const logout = () => {
                     </li>
 
                     <li class="nav-item">
-                        <router-link to="/admin/properties"
-                            :class="$route.path.startsWith('/admin/properties') ? 'active' : ''" class="nav-link">
+                        <router-link to="/admin/products"
+                            :class="$route.path.startsWith('/admin/products') ? 'active' : ''" class="nav-link">
                             <i class="nav-icon fas fa-calendar-alt"></i>
                             <p>
                                 Products
@@ -79,8 +79,8 @@ const logout = () => {
                     </li>
 
                     <li class="nav-item">
-                        <router-link to="/admin/propertytypes"
-                            :class="$route.path.startsWith('/admin/propertytypes') ? 'active' : ''" class="nav-link">
+                        <router-link to="/admin/categories"
+                            :class="$route.path.startsWith('/admin/categories') ? 'active' : ''" class="nav-link">
                             <i class="nav-icon fas fa-calendar-alt"></i>
                             <p>
                                 Categories
@@ -89,8 +89,8 @@ const logout = () => {
                     </li>
 
                     <li class="nav-item">
-                        <router-link to="/admin/amenities"
-                            :class="$route.path.startsWith('/admin/amenities') ? 'active' : ''" class="nav-link">
+                        <router-link to="/admin/attributes"
+                            :class="$route.path.startsWith('/admin/attributes') ? 'active' : ''" class="nav-link">
                             <i class="nav-icon fas fa-calendar-alt"></i>
                             <p>
                                 Colors
@@ -118,25 +118,6 @@ const logout = () => {
                         </router-link>
                     </li>
 
-                    <li class="nav-item">
-                        <router-link to="/admin/locations"
-                            :class="$route.path.startsWith('/admin/locations') ? 'active' : ''" class="nav-link">
-                            <i class="nav-icon fas fa-calendar-alt"></i>
-                            <p>
-                                ABC
-                            </p>
-                        </router-link>
-                    </li>
-
-                    <li class="nav-item">
-                        <router-link to="/admin/services"
-                            :class="$route.path.startsWith('/admin/services') ? 'active' : ''" class="nav-link">
-                            <i class="nav-icon fas fa-calendar-alt"></i>
-                            <p>
-                                ABC
-                            </p>
-                        </router-link>
-                    </li>
 
                     <li class="nav-item">
                         <router-link to="/admin/bookings"

@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\PropertyTypes;
+use App\Models\Categories;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -19,7 +19,7 @@ class PropertiesFactory extends Factory
     public function definition()
     {
         return [
-            'property_type_id' => PropertyTypes::factory()->create()->id,
+            'property_type_id' => Categories::factory()->create()->id,
             'name' => $this->faker->sentence(),
             'slug' => $this->faker->sentence(),
             'description' => $this->faker->paragraph(),

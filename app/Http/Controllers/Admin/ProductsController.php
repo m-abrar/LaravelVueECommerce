@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Properties;
+use App\Models\Products;
 use App\Models\PropertyLineItem;
-use App\Models\PropertyService;
+use App\Models\Productservice;
 use App\Models\PropertyNeighbour;
 use App\Models\PropertyRoom;
 use App\Models\PropertyPrice;
@@ -13,11 +13,11 @@ use Illuminate\Http\Request;
     use App\Models\Locations;
     use App\Models\MediaManager;
 
-class PropertiesController extends Controller
+class ProductsController extends Controller
 {
     public function index()
     {
-        return Properties::query()
+        return Products::query()
         ->with('type')
         ->when(request('type'), function ($query) {
             return $query->where('property_type_id', request('type'));
@@ -28,7 +28,7 @@ class PropertiesController extends Controller
 
     public function getAllMedia($property_id)
     {
-        $property = Properties::findOrFail($property_id);
+        $property = Products::findOrFail($property_id);
 
         $featuredMediaFile = $property->mediaFiles()
             ->wherePivot('is_featured', true)
@@ -56,7 +56,7 @@ class PropertiesController extends Controller
 
     public function featuredUpdate($property_id, $media_id)
     {
-        $property = Properties::findOrFail($property_id);
+        $property = Products::findOrFail($property_id);
 
         $mediaIds = $property->mediaFiles()->pluck('media_id')->toArray();
 
@@ -71,7 +71,7 @@ class PropertiesController extends Controller
 
     public function addOrRemoveMedia($property_id, $media_id)
     {
-        $property = Properties::findOrFail($property_id);
+        $property = Products::findOrFail($property_id);
 
         $existingMedia = $property->mediaFiles()->find($media_id);
 
@@ -116,7 +116,7 @@ class PropertiesController extends Controller
         dd($mediaFiles);
     }
 
-    public function store(Request $request, Properties $properties)
+    public function store(Request $request, Products $products)
     {
         // Define validation rules for specific fields
         $validationRules = [
@@ -133,12 +133,12 @@ class PropertiesController extends Controller
             'property_type_id.required' => 'The category field is required.',
         ]);
         // Update the model with all form fields
-        $properties->create($request->except(['amenities','features','lineitems']));
+        $products->create($request->except(['attributes','features','lineitems']));
 
-        // Use the sync method to update the selected amenities
-        $properties->amenities()->sync($request->input('amenities', []));
+        // Use the sync method to update the selected attributes
+        $products->attributes()->sync($request->input('attributes', []));
         // Use the sync method to update the selected features
-        $properties->features()->sync($request->input('features', []));
+        $products->features()->sync($request->input('features', []));
 
 
         // Handle lineitems if provided
@@ -163,17 +163,17 @@ class PropertiesController extends Controller
         return response()->json(['message' => 'success']);
     }
 
-    public function edit(Properties $properties)
+    public function edit(Products $products)
     {
-        $properties->load('services')->load('lineitems')->load('neighbours')->load('rooms')->load('prices')->load('bookings');
-        $properties['associated_amenities'] = $properties->amenities->pluck('id');
-        $properties['associated_features'] = $properties->features->pluck('id');
-        $properties['associated_categories'] = $properties->categories->pluck('id');
+        $products->load('services')->load('lineitems')->load('neighbours')->load('rooms')->load('prices')->load('bookings');
+        $products['associated_attributes'] = $products->attributes->pluck('id');
+        $products['associated_features'] = $products->features->pluck('id');
+        $products['associated_categories'] = $products->categories->pluck('id');
 
-        return $properties;
+        return $products;
     }
 
-    public function update(Request $request, Properties $properties)
+    public function update(Request $request, Products $products)
     {
         // Define validation rules for specific fields
         $validationRules = [
@@ -190,23 +190,23 @@ class PropertiesController extends Controller
             'property_type_id.required' => 'The category field is required.',
         ]);
         // Update the model with all form fields
-        $properties->update($request->except(['amenities','features','categories']));
+        $products->update($request->except(['attributes','features','categories']));
 
-        // Use the sync method to update the selected amenities
-        $properties->amenities()->sync($request->input('amenities', []));
+        // Use the sync method to update the selected attributes
+        $products->attributes()->sync($request->input('attributes', []));
         // Use the sync method to update the selected features
-        $properties->features()->sync($request->input('features', []));
+        $products->features()->sync($request->input('features', []));
         // Use the sync method to update the selected features
-        $properties->categories()->sync($request->input('categories', []));
+        $products->categories()->sync($request->input('categories', []));
 
 
         return response()->json(['success' => true]);
     }
 
 
-    public function destroy(Properties $properties)
+    public function destroy(Products $products)
     {
-        $properties->delete();
+        $products->delete();
 
         return response()->json(['success' => true], 200);
     }

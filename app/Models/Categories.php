@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\AppointmentStatus;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Storage;
 use App\Traits\MediaFile;
 
-class Amenities extends Model
+class Categories extends Model
 {
     use HasFactory, MediaFile;
 
@@ -52,15 +52,10 @@ class Amenities extends Model
     //     );
     // }
 
-    public function image(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => asset(Storage::url($value) ?? 'noimage.png'),
-        );
-    }
-
-    public function properties()
-    {
-        return $this->belongsToMany(Properties::class, 'property_amenity_pivot', 'amenity_id', 'property_id');
-    }
+    // public function image(): Attribute
+    // {
+    //     return Attribute::make(
+    //         get: fn ($value) => asset(Storage::url($value) ?? 'noimage.png'),
+    //     );
+    // }
 }

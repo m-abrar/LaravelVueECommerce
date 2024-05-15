@@ -4,7 +4,7 @@ import { reactive, onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useToastr } from "@/toastr";
 import { Form } from "vee-validate";
-import PropertyTypeFormPictures from "./PropertyTypeFormPictures.vue"; // Import the child component
+import CategoryFormPictures from "./CategoryFormPictures.vue"; // Import the child component
 
 const router = useRouter();
 const route = useRoute();
@@ -17,17 +17,17 @@ const form = reactive({
 
 const handleSubmit = (values, actions) => {
     if (editMode.value) {
-        editPropertyType(values, actions);
+        editCategory(values, actions);
     } else {
-        createPropertyType(values, actions);
+        createCategory(values, actions);
     }
 };
 
-const createPropertyType = (values, actions) => {
+const createCategory = (values, actions) => {
     axios
-        .post("/api/propertytypes/create", form)
+        .post("/api/categories/create", form)
         .then((response) => {
-            router.push("/admin/propertytypes");
+            router.push("/admin/categories");
             toastr.success("Category created successfully!");
         })
         .catch((error) => {
@@ -35,11 +35,11 @@ const createPropertyType = (values, actions) => {
         });
 };
 
-const editPropertyType = (values, actions) => {
+const editCategory = (values, actions) => {
     axios
-        .put(`/api/propertytypes/${route.params.id}/edit`, form)
+        .put(`/api/categories/${route.params.id}/edit`, form)
         .then((response) => {
-            router.push("/admin/propertytypes");
+            router.push("/admin/categories");
             toastr.success("Category updated successfully!");
         })
         .catch((error) => {
@@ -47,8 +47,8 @@ const editPropertyType = (values, actions) => {
         });
 };
 
-const getPropertyType = () => {
-    axios.get(`/api/propertytypes/${route.params.id}/edit`).then(({ data }) => {
+const getCategory = () => {
+    axios.get(`/api/categories/${route.params.id}/edit`).then(({ data }) => {
         console.log(data);
         form.id = data.id;
         form.name = data.name;
@@ -61,9 +61,9 @@ const getPropertyType = () => {
 const editMode = ref(false);
 
 onMounted(() => {
-    if (route.name === "admin.propertytypes.edit") {
+    if (route.name === "admin.categories.edit") {
         editMode.value = true;
-        getPropertyType();
+        getCategory();
     }
 });
 
@@ -84,7 +84,7 @@ const handleFileChange = async (event) => {
 
     // Send the FormData to your server for processing
     axios
-        .post("/api/propertytypes/upload-image", formData)
+        .post("/api/categories/upload-image", formData)
         .then((response) => {
             console.log(response);
             form.image_created = response.data.image_created;
@@ -115,7 +115,7 @@ const handleFileChange = async (event) => {
                             >
                         </li>
                         <li class="breadcrumb-item">
-                            <router-link to="/admin/propertytypes"
+                            <router-link to="/admin/categories"
                                 >Category</router-link
                             >
                         </li>
@@ -170,11 +170,11 @@ const handleFileChange = async (event) => {
                                         </option>
                                         <!-- Populate options based on categories -->
                                         <option
-                                            v-for="propertyType in propertyTypes"
-                                            :value="propertyType.id"
-                                            :key="propertyType.id"
+                                            v-for="category in categories"
+                                            :value="category.id"
+                                            :key="category.id"
                                         >
-                                            {{ propertyType.name }}
+                                            {{ category.name }}
                                         </option>
                                     </select>
                                     <span class="invalid-feedback">{{

@@ -33,8 +33,8 @@ class BookingController extends Controller
         // Update the model with all form fields
         $booking->update($request->except(['property','lineitems','services','payments']));
 
-        // Use the sync method to update the selected amenities
-        $booking->amenities()->sync($request->input('amenities', []));
+        // Use the sync method to update the selected attributes
+        $booking->attributes()->sync($request->input('attributes', []));
         // Use the sync method to update the selected features
         $booking->features()->sync($request->input('features', []));
 

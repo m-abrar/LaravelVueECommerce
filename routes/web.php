@@ -1,10 +1,11 @@
 <?php
 
 use App\Http\Controllers\Admin\AppointmentController;
-use App\Http\Controllers\Admin\PropertiesController;
+use App\Http\Controllers\Admin\ProductsController;
 use App\Http\Controllers\Admin\BookingController;
-use App\Http\Controllers\Admin\PropertyTypesController;
+use App\Http\Controllers\Admin\CategoriesController;
 use App\Http\Controllers\Admin\AmenitiesController;
+use App\Http\Controllers\Admin\AttributesController;
 use App\Http\Controllers\Admin\LocationsController;
 use App\Http\Controllers\Admin\FeaturesController;
 use App\Http\Controllers\Admin\ServicesController;
@@ -63,7 +64,6 @@ Route::prefix('/api/slider/{slider_id}/media')->name('api.slider.media.')->group
     Route::get('/add-remove/{media_id}', [SlidersController::class, 'addOrRemoveMedia'])->name('add-remove');
 });
 
-
 Route::prefix('/api/service/{service_id}/media')->name('api.service.media.')->group(function () {
     Route::get('/all', [ServicesController::class, 'getAllMedia'])->name('index');
     Route::get('/featured-update/{media_id}', [ServicesController::class, 'featuredUpdate'])->name('featured-update');
@@ -76,13 +76,11 @@ Route::prefix('/api/location/{location_id}/media')->name('api.location.media.')-
     Route::get('/add-remove/{media_id}', [LocationsController::class, 'addOrRemoveMedia'])->name('add-remove');
 });
 
-
 Route::prefix('/api/lineitem/{line_item_id}/media')->name('api.lineitem.media.')->group(function () {
     Route::get('/all', [LineitemsController::class, 'getAllMedia'])->name('index');
     Route::get('/featured-update/{media_id}', [LineitemsController::class, 'featuredUpdate'])->name('featured-update');
     Route::get('/add-remove/{media_id}', [LineitemsController::class, 'addOrRemoveMedia'])->name('add-remove');
 });
-
 
 Route::prefix('/api/feature/{feature_id}/media')->name('api.feature.media.')->group(function () {
     Route::get('/all', [FeaturesController::class, 'getAllMedia'])->name('index');
@@ -90,25 +88,23 @@ Route::prefix('/api/feature/{feature_id}/media')->name('api.feature.media.')->gr
     Route::get('/add-remove/{media_id}', [FeaturesController::class, 'addOrRemoveMedia'])->name('add-remove');
 });
 
-
-Route::prefix('/api/amenity/{amenity_id}/media')->name('api.amenity.media.')->group(function () {
-    Route::get('/all', [AmenitiesController::class, 'getAllMedia'])->name('index');
-    Route::get('/featured-update/{media_id}', [AmenitiesController::class, 'featuredUpdate'])->name('featured-update');
-    Route::get('/add-remove/{media_id}', [AmenitiesController::class, 'addOrRemoveMedia'])->name('add-remove');
+Route::prefix('/api/attribute/{attribute_id}/media')->name('api.attribute.media.')->group(function () {
+    Route::get('/all', [AttributesController::class, 'getAllMedia'])->name('index');
+    Route::get('/featured-update/{media_id}', [AttributesController::class, 'featuredUpdate'])->name('featured-update');
+    Route::get('/add-remove/{media_id}', [AttributesController::class, 'addOrRemoveMedia'])->name('add-remove');
 });
 
-Route::prefix('/api/propertytype/{propertytype_id}/media')->name('api.propertytype.media.')->group(function () {
-    Route::get('/all', [PropertyTypesController::class, 'getAllMedia'])->name('index');
-    Route::get('/featured-update/{media_id}', [PropertyTypesController::class, 'featuredUpdate'])->name('featured-update');
-    Route::get('/add-remove/{media_id}', [PropertyTypesController::class, 'addOrRemoveMedia'])->name('add-remove');
+Route::prefix('/api/category/{category_id}/media')->name('api.category.media.')->group(function () {
+    Route::get('/all', [CategoriesController::class, 'getAllMedia'])->name('index');
+    Route::get('/featured-update/{media_id}', [CategoriesController::class, 'featuredUpdate'])->name('featured-update');
+    Route::get('/add-remove/{media_id}', [CategoriesController::class, 'addOrRemoveMedia'])->name('add-remove');
 });
 
 Route::prefix('/api/property/{property_id}/media')->name('api.property.media.')->group(function () {
-    Route::get('/all', [PropertiesController::class, 'getAllMedia'])->name('index');
-    Route::get('/featured-update/{media_id}', [PropertiesController::class, 'featuredUpdate'])->name('featured-update');
-    Route::get('/add-remove/{media_id}', [PropertiesController::class, 'addOrRemoveMedia'])->name('add-remove');
+    Route::get('/all', [ProductsController::class, 'getAllMedia'])->name('index');
+    Route::get('/featured-update/{media_id}', [ProductsController::class, 'featuredUpdate'])->name('featured-update');
+    Route::get('/add-remove/{media_id}', [ProductsController::class, 'addOrRemoveMedia'])->name('add-remove');
 });
-
 
 Route::get('/api/media', [MediaController::class, 'index'])->name('media.index');
 Route::get('/media/{id}/edit', [MediaController::class, 'edit'])->name('media.edit');
@@ -118,10 +114,6 @@ Route::post('/media-upload', [MediaController::class, 'upload']);
 
 // Route::post('/api/upload-file', [ApplicationController::class, 'uploadFile']);
 
-
-
-
-
 Route::middleware('auth')->group(function () {
 
     Route::get('/api/sliders', [SlidersController::class, 'index']);
@@ -129,7 +121,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/sliders/{id}/edit', [SlidersController::class, 'edit']);
     Route::put('/api/sliders/{sliders}/edit', [SlidersController::class, 'update']);
     Route::delete('/api/sliders/{sliders}', [SlidersController::class, 'destroy']);
-
+    Route::post('/api/sliders/update-sort-order', [SlidersController::class, 'updateSortOrder']);
 
     Route::get('/api/stats/appointments', [DashboardStatController::class, 'appointments']);
     Route::get('/api/stats/users', [DashboardStatController::class, 'users']);
@@ -150,19 +142,29 @@ Route::middleware('auth')->group(function () {
     Route::put('/api/appointments/{appointment}/edit', [AppointmentController::class, 'update']);
     Route::delete('/api/appointments/{appointment}', [AppointmentController::class, 'destroy']);
 
-    Route::get('/api/propertytypes', [PropertyTypesController::class, 'index']);
-    Route::post('/api/propertytypes/create', [PropertyTypesController::class, 'store']);
-    Route::get('/api/propertytypes/withcount', [PropertyTypesController::class, 'getTypesWithCount']);
-    Route::get('/api/propertytypes/{propertyType}/edit', [PropertyTypesController::class, 'edit']);
-    Route::put('/api/propertytypes/{propertyType}/edit', [PropertyTypesController::class, 'update']);
-    Route::delete('/api/propertytypes/{propertytype}', [PropertyTypesController::class, 'destroy']);
-    Route::post('/api/propertytypes/upload-image', [PropertyTypesController::class, 'uploadImage']);
+    Route::get('/api/categories', [CategoriesController::class, 'index']);
+    Route::post('/api/categories/create', [CategoriesController::class, 'store']);
+    Route::get('/api/categories/withcount', [CategoriesController::class, 'getTypesWithCount']);
+    Route::get('/api/categories/{category}/edit', [CategoriesController::class, 'edit']);
+    Route::put('/api/categories/{category}/edit', [CategoriesController::class, 'update']);
+    Route::delete('/api/categories/{category}', [CategoriesController::class, 'destroy']);
+    Route::post('/api/categories/upload-image', [CategoriesController::class, 'uploadImage']);
+    Route::post('/api/categories/update-sort-order', [CategoriesController::class, 'updateSortOrder']);
 
-    Route::get('/api/properties', [PropertiesController::class, 'index']);
-    Route::post('/api/properties/create', [PropertiesController::class, 'store']);
-    Route::get('/api/properties/{properties}/edit', [PropertiesController::class, 'edit']);
-    Route::put('/api/properties/{properties}/edit', [PropertiesController::class, 'update']);
-    Route::delete('/api/properties/{properties}', [PropertiesController::class, 'destroy']);
+    Route::get('/api/products', [ProductsController::class, 'index']);
+    Route::post('/api/products/create', [ProductsController::class, 'store']);
+    Route::get('/api/products/{products}/edit', [ProductsController::class, 'edit']);
+    Route::put('/api/products/{products}/edit', [ProductsController::class, 'update']);
+    Route::delete('/api/products/{products}', [ProductsController::class, 'destroy']);
+
+    Route::get('/api/attributes', [AttributesController::class, 'index']);
+    Route::post('/api/attributes/create', [AttributesController::class, 'store']);
+    Route::get('/api/attributes/withcount', [AttributesController::class, 'getTypesWithCount']);
+    Route::get('/api/attributes/{attributes}/edit', [AttributesController::class, 'edit']);
+    Route::put('/api/attributes/{attributes}/edit', [AttributesController::class, 'update']);
+    Route::delete('/api/attributes/{attributes}', [AttributesController::class, 'destroy']);
+    Route::post('/api/attributes/upload-image', [AttributesController::class, 'uploadImage']);
+    Route::post('/api/attributes/update-sort-order', [AttributesController::class, 'updateSortOrder']);
 
     Route::get('/api/amenities', [AmenitiesController::class, 'index']);
     Route::post('/api/amenities/create', [AmenitiesController::class, 'store']);
@@ -171,6 +173,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/api/amenities/{amenities}/edit', [AmenitiesController::class, 'update']);
     Route::delete('/api/amenities/{amenities}', [AmenitiesController::class, 'destroy']);
     Route::post('/api/amenities/upload-image', [AmenitiesController::class, 'uploadImage']);
+    Route::post('/api/amenities/update-sort-order', [AmenitiesController::class, 'updateSortOrder']);
 
     Route::get('/api/features', [FeaturesController::class, 'index']);
     Route::post('/api/features/create', [FeaturesController::class, 'store']);
@@ -204,7 +207,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/api/locations/{locations}', [LocationsController::class, 'destroy']);
     Route::post('/api/locations/upload-image', [LocationsController::class, 'uploadImage']);
 
-
     Route::get('/api/settings', [SettingController::class, 'index']);
     Route::post('/api/settings', [SettingController::class, 'update']);
 
@@ -213,18 +215,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/upload-profile-image', [ProfileController::class, 'uploadImage']);
     Route::post('/api/change-user-password', [ProfileController::class, 'changePassword']);
 
-
-
     Route::get('/api/bookings', [BookingController::class, 'index']);
     Route::post('/api/booking/create', [BookingController::class, 'store']);
     Route::get('/api/booking/{booking}/edit', [BookingController::class, 'edit']);
     Route::put('/api/booking/{booking}/edit', [BookingController::class, 'update']);
     Route::delete('/api/booking/{booking}', [BookingController::class, 'destroy']);
 
-
 });
 
 Route::get('{view}', ApplicationController::class)->where('view', '(.*)')->middleware('auth');
-
-
-

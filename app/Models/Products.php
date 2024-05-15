@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Traits\MediaFile;
 
-class Properties extends Model
+class Products extends Model
 {
     use HasFactory, MediaFile;
 
@@ -43,52 +43,52 @@ class Properties extends Model
 
     public function type()
     {
-        return $this->belongsTo(PropertyTypes::class, 'property_type_id');
+        return $this->belongsTo(Categories::class, 'category_id');
     }
 
-    public function amenities()
+    public function attributes()
     {
-        return $this->belongsToMany(Amenities::class, 'property_amenity_pivot', 'property_id', 'amenity_id');
+        return $this->belongsToMany(Attributes::class, 'category_attribute_pivot', 'category_id', 'attribute_id');
     }
 
     public function features()
     {
-        return $this->belongsToMany(Features::class, 'property_feature_pivot', 'property_id', 'feature_id');
+        return $this->belongsToMany(Features::class, 'category_feature_pivot', 'category_id', 'feature_id');
     }
 
     public function categories()
     {
-        return $this->belongsToMany(PropertyTypes::class, 'property_category_pivot', 'property_id', 'category_id');
+        return $this->belongsToMany(Categories::class, 'category_category_pivot', 'category_id', 'category_id');
     }
 
     public function lineitems()
     {
-        return $this->hasMany(PropertyLineItem::class, 'property_id');
+        return $this->hasMany(CategoryLineItem::class, 'category_id');
     }
 
     public function services()
     {
-        return $this->hasMany(PropertyService::class, 'property_id');
+        return $this->hasMany(CategoryService::class, 'category_id');
     }
 
     public function neighbours()
     {
-        return $this->hasMany(PropertyNeighbour::class, 'property_id');
+        return $this->hasMany(CategoryNeighbour::class, 'category_id');
     }
 
     public function rooms()
     {
-        return $this->hasMany(PropertyRoom::class, 'property_id');
+        return $this->hasMany(CategoryRoom::class, 'category_id');
     }
 
     public function prices()
     {
-        return $this->hasMany(PropertyPrice::class, 'property_id');
+        return $this->hasMany(CategoryPrice::class, 'category_id');
     }
 
     public function bookings()
     {
-        return $this->hasMany(Booking::class, 'property_id');
+        return $this->hasMany(Booking::class, 'category_id');
     }
 
 }

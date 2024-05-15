@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 use App\Traits\MediaFile;
 
-class PropertyService extends Model
+class Productservice extends Model
 {
     use HasFactory, MediaFile;
 
@@ -61,7 +61,7 @@ class PropertyService extends Model
 
     public function property()
     {
-        return $this->belongsTo(Properties::class, 'property_id');
+        return $this->belongsTo(Products::class, 'property_id');
     }
 
 }

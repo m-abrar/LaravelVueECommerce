@@ -17,13 +17,13 @@ const form = reactive({
 
 const handleSubmit = (values, actions) => {
     if (editMode.value) {
-        editPropertyType(values, actions);
+        editCategory(values, actions);
     } else {
-        createPropertyType(values, actions);
+        createCategory(values, actions);
     }
 };
 
-const createPropertyType = (values, actions) => {
+const createCategory = (values, actions) => {
     axios.post('/api/lineitems/create', form)
         .then((response) => {
             router.push('/admin/lineitems');
@@ -34,7 +34,7 @@ const createPropertyType = (values, actions) => {
         })
 };
 
-const editPropertyType = (values, actions) => {
+const editCategory = (values, actions) => {
     axios.put(`/api/lineitems/${route.params.id}/edit`, form)
         .then((response) => {
             router.push('/admin/lineitems');
@@ -46,7 +46,7 @@ const editPropertyType = (values, actions) => {
 };
 
 
-const getPropertyType = () => {
+const getCategory = () => {
     axios.get(`/api/lineitems/${route.params.id}/edit`)
         .then(({ data }) => {
             console.log(data);
@@ -64,7 +64,7 @@ const editMode = ref(false);
 onMounted(() => {
     if (route.name === 'admin.lineitems.edit') {
         editMode.value = true;
-        getPropertyType();
+        getCategory();
     }
 });
 

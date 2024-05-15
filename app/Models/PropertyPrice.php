@@ -60,7 +60,7 @@ class PropertyPrice extends Model
 
     public function property()
     {
-        return $this->belongsTo(Properties::class, 'property_id');
+        return $this->belongsTo(Products::class, 'property_id');
     }
 
 }

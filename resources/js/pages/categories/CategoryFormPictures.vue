@@ -120,7 +120,7 @@ export default {
 
     const addRemoveAttachment = (attachment_id) => {
 
-      var feature_image_url = `/api/propertytype/${route.params.id}/media/add-remove/${attachment_id}`;
+      var feature_image_url = `/api/category/${route.params.id}/media/add-remove/${attachment_id}`;
       axios.get(feature_image_url)
         .then((response) => {
           toastr.success('Image has been ' + JSON.stringify(response.data));
@@ -160,7 +160,7 @@ export default {
     const featuredMediaFile = ref([]);
 
     const getMediaFiles = () => {
-      axios.get(`/api/propertytype/${route.params.id}/media/all`)
+      axios.get(`/api/category/${route.params.id}/media/all`)
         .then((response) => {
           featuredMediaFile.value = response.data.featuredMediaFile;
           mediaFiles.value = response.data.mediaFiles;
@@ -175,7 +175,7 @@ export default {
       this.attachments.map((attachment, index) => {
         attachment.order = index + 1;
       })
-      axios.put('/api/propertytype/images-order-update', {
+      axios.put('/api/category/images-order-update', {
         attachments: this.attachments
       }).then((response) => {
         console.log(response);
@@ -184,7 +184,7 @@ export default {
 
     const featureAttachment = (attachment_id) => {
 
-      var feature_image_url = `/api/propertytype/${route.params.id}/media/featured-update/${attachment_id}`;
+      var feature_image_url = `/api/category/${route.params.id}/media/featured-update/${attachment_id}`;
 
       axios.get(feature_image_url)
         .then((response) => {

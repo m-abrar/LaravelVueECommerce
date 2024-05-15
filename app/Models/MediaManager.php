@@ -22,6 +22,6 @@ class MediaManager extends Model implements HasMedia
         return null; // Handle case where no media item is found
     }
     
-    protected $fillable = ['name','file_name','mime_type','size','custom_properties','model_id','model_type']; 
+    protected $fillable = ['name','file_name','mime_type','size','custom_products','model_id','model_type']; 
 
 }

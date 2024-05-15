@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Amenities;
+use App\Models\Attributes;
 use App\Http\Controllers\Controller;
-use App\Models\Properties;
+use App\Models\Products;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,15 +12,16 @@ class AmenitiesController extends Controller
 {
     public function index()
     {
-        return Amenities::all();
+        // return Attributes::all();
+        return Attributes::orderBy('sort_order')->get();
     }
 
 
-    public function getAllMedia($amenity_id)
+    public function getAllMedia($attribute_id)
     {
-        $amenity = Amenities::findOrFail($amenity_id);
+        $attribute = Attributes::findOrFail($attribute_id);
 
-        $featuredMediaFile = $amenity->mediaFiles()
+        $featuredMediaFile = $attribute->mediaFiles()
             ->wherePivot('is_featured', true)
             ->latest()
             ->first();
@@ -28,7 +29,7 @@ class AmenitiesController extends Controller
             $featuredMediaFile->url = $featuredMediaFile->getUrl();
         }
 
-        $mediaFiles = $amenity->mediaFiles()->orderBy('display_order', 'ASC')->get();
+        $mediaFiles = $attribute->mediaFiles()->orderBy('display_order', 'ASC')->get();
 
         $mediaFiles->each(function ($mediaItem) {
             $mediaItem->url = $mediaItem->getUrl();
@@ -43,32 +44,32 @@ class AmenitiesController extends Controller
         ];
     }
 
-    public function featuredUpdate($amenity_id, $media_id)
+    public function featuredUpdate($attribute_id, $media_id)
     {
-        $amenity = Amenities::findOrFail($amenity_id);
+        $attribute = Attributes::findOrFail($attribute_id);
 
-        $mediaIds = $amenity->mediaFiles()->pluck('media_id')->toArray();
+        $mediaIds = $attribute->mediaFiles()->pluck('media_id')->toArray();
 
         foreach ($mediaIds as $mediaId) {
-            $amenity->mediaFiles()->updateExistingPivot($mediaId, ['is_featured' => false]);
+            $attribute->mediaFiles()->updateExistingPivot($mediaId, ['is_featured' => false]);
         }
 
-        $response = $amenity->mediaFiles()->updateExistingPivot($media_id, ['is_featured' => true]);
+        $response = $attribute->mediaFiles()->updateExistingPivot($media_id, ['is_featured' => true]);
 
         return $response;
     }
 
-    public function addOrRemoveMedia($amenity_id, $media_id)
+    public function addOrRemoveMedia($attribute_id, $media_id)
     {
-        $amenity = Amenities::findOrFail($amenity_id);
+        $attribute = Attributes::findOrFail($attribute_id);
 
-        $existingMedia = $amenity->mediaFiles()->find($media_id);
+        $existingMedia = $attribute->mediaFiles()->find($media_id);
 
         if ($existingMedia) {
-            $response = $amenity->mediaFiles()->detach($media_id, ['model_type' => get_class($amenity)]);
+            $response = $attribute->mediaFiles()->detach($media_id, ['model_type' => get_class($attribute)]);
             return 'removed';
         } else {
-            $response = $amenity->mediaFiles()->attach($media_id, ['model_type' => get_class($amenity)]);
+            $response = $attribute->mediaFiles()->attach($media_id, ['model_type' => get_class($attribute)]);
             return 'attached';
         }
     }
@@ -80,7 +81,7 @@ class AmenitiesController extends Controller
             'name' => 'required',
         ]);
 
-        Amenities::create([
+        Attributes::create([
             'name' => $validated['name'],
             'description' => $request->description,
             'image' => $request->image_created,
@@ -88,18 +89,18 @@ class AmenitiesController extends Controller
         return response()->json(['message' => 'success']);
     }
 
-    public function edit(Amenities $amenities)
+    public function edit(Attributes $attributes)
     {
-        return $amenities;
+        return $attributes;
     }
 
-    public function update(Request $request, Amenities $amenities)
+    public function update(Request $request, Attributes $attributes)
     {
         $validated = request()->validate([
             'name' => 'required',
         ]);
 
-        $amenities->update([
+        $attributes->update([
             'name' => $validated['name'],
             'description' => $request->description,
         ]);
@@ -122,17 +123,29 @@ class AmenitiesController extends Controller
             // Store the image in the 'public' disk under the 'images' directory
             // // Storage::disk('public')->put('images/' . $filename, file_get_contents($file));
             // You can save the image file path in your database if needed
-            Amenities::where('id', $request->id)->update(['image' => $link]);
+            Attributes::where('id', $request->id)->update(['image' => $link]);
             return response()->json(['success' => true, 'image_created' => $link]);
         } else {
             return response()->json(['success' => false, 'message' => 'No file uploaded.']);
         }
     }
 
-    public function destroy(Amenities $amenities)
+    public function destroy(Attributes $attributes)
     {
-        $amenities->delete();
+        $attributes->delete();
 
         return response()->json(['success' => true], 200);
+    }
+
+
+    public function updateSortOrder(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        foreach ($ids as $index => $id) {
+            Attributes::where('id', $id)->update(['sort_order' => $index + 1]);
+        }
+
+        return response()->json(['message' => 'Sort order updated successfully']);
     }
 }

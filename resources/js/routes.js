@@ -8,12 +8,14 @@ import ListAppointments from './pages/appointments/ListAppointments.vue';
 import AppointmentForm from './pages/appointments/AppointmentForm.vue';
 import ListBookings from './pages/bookings/ListBookings.vue';
 import BookingForm from './pages/bookings/BookingForm.vue';
-import ListProperties from './pages/properties/ListProperties.vue';
-import PropertiesForm from './pages/properties/PropertiesForm.vue';
-import ListPropertyTypes from './pages/propertytypes/ListPropertyTypes.vue';
-import PropertyTypeForm from './pages/propertytypes/PropertyTypeForm.vue';
+import ListProducts from './pages/products/ListProducts.vue';
+import ProductsForm from './pages/products/ProductsForm.vue';
+import ListCategories from './pages/categories/ListCategories.vue';
+import CategoryForm from './pages/categories/Categoryform.vue';
 import ListAmenities from './pages/amenities/ListAmenities.vue';
+import ListAttributes from './pages/attributes/ListAttributes.vue';
 import AmenitiesForm from './pages/amenities/AmenitiesForm.vue';
+import AttributesForm from './pages/attributes/AttributesForm.vue';
 import ListFeatures from './pages/features/ListFeatures.vue';
 import FeaturesForm from './pages/features/FeaturesForm.vue';
 import ListServices from './pages/services/ListServices.vue';
@@ -125,57 +127,57 @@ export default [
 
 
     {
-        path: '/admin/properties',
-        name: 'admin.properties',
-        component: ListProperties,
+        path: '/admin/products',
+        name: 'admin.products',
+        component: ListProducts,
     },
 
     {
-        path: '/admin/properties/create',
-        name: 'admin.properties.create',
-        component: PropertiesForm,
+        path: '/admin/products/create',
+        name: 'admin.products.create',
+        component: ProductsForm,
     },
 
     {
-        path: '/admin/properties/:id/edit',
-        name: 'admin.properties.edit',
-        component: PropertiesForm,
+        path: '/admin/products/:id/edit',
+        name: 'admin.products.edit',
+        component: ProductsForm,
     },
 
     {
-        path: '/admin/propertytypes/create',
-        name: 'admin.propertytypes.create',
-        component: PropertyTypeForm,
+        path: '/admin/categories/create',
+        name: 'admin.categories.create',
+        component: CategoryForm,
     },
 
     {
-        path: '/admin/propertytypes/:id/edit',
-        name: 'admin.propertytypes.edit',
-        component: PropertyTypeForm,
+        path: '/admin/categories/:id/edit',
+        name: 'admin.categories.edit',
+        component: CategoryForm,
     },
 
     {
-        path: '/admin/propertytypes',
-        name: 'admin.propertytypes',
-        component: ListPropertyTypes,
+        path: '/admin/categories',
+        name: 'admin.categories',
+        component: ListCategories,
     },
 
 
     {
-        path: '/admin/amenities',
-        name: 'admin.amenities',
-        component: ListAmenities,
+        path: '/admin/attributes',
+        name: 'admin.attributes',
+        component: ListAttributes,
     },
 
     {
-        path: '/admin/amenities/create',
-        name: 'admin.amenities.create',
-        component: AmenitiesForm,
+        path: '/admin/attributes/create',
+        name: 'admin.attributes.create',
+        component: AttributesForm,
     },
 
     {
-        path: '/admin/amenities/:id/edit',
-        name: 'admin.amenities.edit',
+        path: '/admin/attributes/:id/edit',
+        name: 'admin.attributes.edit',
         component: AmenitiesForm,
     },
 

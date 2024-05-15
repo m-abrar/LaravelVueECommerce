@@ -2,21 +2,22 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\PropertyTypes;
+use App\Models\Categories;
 use App\Http\Controllers\Controller;
-use App\Models\Properties;
+use App\Models\Products;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class PropertyTypesController extends Controller
+class CategoriesController extends Controller
 {
     public function index()
     {
-        return PropertyTypes::all();
+        // return Categories::all();
+        return Categories::orderBy('sort_order')->get();
     }
     public function getTypesWithCount()
     {
-        $types = PropertyTypes::all();
+        $types = Categories::all();
 
         // dd($types);
 
@@ -24,8 +25,8 @@ class PropertyTypesController extends Controller
             return [
                 'id' => $type->id,
                 'name' => $type->name,
-                'count' => Properties::where('property_type_id', $type->id)->count(),
-                'color' => 'success', //PropertyType::from($status->value)->color(),
+                'count' => Products::where('property_type_id', $type->id)->count(),
+                'color' => 'success', //Category::from($status->value)->color(),
             ];
         });
     }
@@ -33,7 +34,7 @@ class PropertyTypesController extends Controller
 
     public function getAllMedia($service_id)
     {
-        $service = PropertyTypes::findOrFail($service_id);
+        $service = Categories::findOrFail($service_id);
 
         $featuredMediaFile = $service->mediaFiles()
             ->wherePivot('is_featured', true)
@@ -63,7 +64,7 @@ class PropertyTypesController extends Controller
 
     public function featuredUpdate($service_id, $media_id)
     {
-        $service = PropertyTypes::findOrFail($service_id);
+        $service = Categories::findOrFail($service_id);
 
         $mediaIds = $service->mediaFiles()->pluck('media_id')->toArray();
 
@@ -78,7 +79,7 @@ class PropertyTypesController extends Controller
 
     public function addOrRemoveMedia($service_id, $media_id)
     {
-        $service = PropertyTypes::findOrFail($service_id);
+        $service = Categories::findOrFail($service_id);
 
         $existingMedia = $service->mediaFiles()->find($media_id);
 
@@ -99,7 +100,7 @@ class PropertyTypesController extends Controller
             'name' => 'required',
         ]);
 
-        PropertyTypes::create([
+        Categories::create([
             'name' => $validated['name'],
             'description' => $request->description,
             'image' => $request->image_created,
@@ -107,18 +108,18 @@ class PropertyTypesController extends Controller
         return response()->json(['message' => 'success']);
     }
 
-    public function edit(PropertyTypes $propertyType)
+    public function edit(Categories $category)
     {
-        return $propertyType;
+        return $category;
     }
 
-    public function update(Request $request, PropertyTypes $propertyType)
+    public function update(Request $request, Categories $category)
     {
         $validated = request()->validate([
             'name' => 'required',
         ]);
 
-        $propertyType->update([
+        $category->update([
             'name' => $validated['name'],
             'description' => $request->description,
         ]);
@@ -141,17 +142,28 @@ class PropertyTypesController extends Controller
             // Store the image in the 'public' disk under the 'images' directory
             // // Storage::disk('public')->put('images/' . $filename, file_get_contents($file));
             // You can save the image file path in your database if needed
-            PropertyTypes::where('id', $request->id)->update(['image' => $link]);
+            Categories::where('id', $request->id)->update(['image' => $link]);
             return response()->json(['success' => true, 'image_created' => $link]);
         } else {
             return response()->json(['success' => false, 'message' => 'No file uploaded.']);
         }
     }
 
-    public function destroy(PropertyTypes $propertyType)
+    public function destroy(Categories $category)
     {
-        $propertyType->delete();
+        $category->delete();
 
         return response()->json(['success' => true], 200);
+    }
+
+    public function updateSortOrder(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        foreach ($ids as $index => $id) {
+            Categories::where('id', $id)->update(['sort_order' => $index + 1]);
+        }
+
+        return response()->json(['message' => 'Sort order updated successfully']);
     }
 }

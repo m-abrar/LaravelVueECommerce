@@ -3,12 +3,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">Amenities</h1>
+            <h1 class="m-0">Attributes</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Amenities</li>
+              <li class="breadcrumb-item active">Attributes</li>
             </ol>
           </div>
         </div>
@@ -18,15 +18,15 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-lg-12">
-            <!-- Add New Amenity Button -->
+            <!-- Add New Attribute Button -->
             <div class="d-flex justify-content-between mb-2">
               <div>
-                <router-link to="/admin/amenities/create">
-                  <button class="btn btn-primary"><i class="fa fa-plus-circle mr-1"></i> Add New Amenity</button>
+                <router-link to="/admin/attributes/create">
+                  <button class="btn btn-primary"><i class="fa fa-plus-circle mr-1"></i> Add New Attribute</button>
                 </router-link>
               </div>
             </div>
-            <!-- Amenities Table -->
+            <!-- Attributes Table -->
             <div class="card">
               <div class="card-body">
                 <table class="table table-bordered">
@@ -38,16 +38,16 @@
                     </tr>
                   </thead>
                   <tbody ref="sortableList">
-                    <tr v-for="(amenity, index) in amenities" :key="amenity.id">
+                    <tr v-for="(attribute, index) in attributes" :key="attribute.id">
                       <td>{{ index + 1 }}</td>
-                      <td>{{ amenity.name }}</td>
+                      <td>{{ attribute.name }}</td>
                       <td>
-                        <!-- Edit Amenity Link -->
-                        <router-link :to="`/admin/amenities/${amenity.id}/edit`">
+                        <!-- Edit Attribute Link -->
+                        <router-link :to="`/admin/attributes/${attribute.id}/edit`">
                           <i class="fa fa-edit mr-2"></i>
                         </router-link>
-                        <!-- Delete Amenity Button -->
-                        <a href="#" @click.prevent="deleteAmenity(amenity.id)">
+                        <!-- Delete Attribute Button -->
+                        <a href="#" @click.prevent="deleteAttribute(attribute.id)">
                           <i class="fa fa-trash text-danger"></i>
                         </a>
                       </td>
@@ -69,16 +69,16 @@
   import Swal from 'sweetalert2';
   
   const sortableList = ref(null);
-  const amenities = ref([]);
+  const attributes = ref([]);
   
-  const fetchAmenities = () => {
-    axios.get('/api/amenities')
+  const fetchAttributes = () => {
+    axios.get('/api/attributes')
       .then(response => {
-        amenities.value = response.data;
+        attributes.value = response.data;
         initSortable();
       })
       .catch(error => {
-        console.error('Error fetching amenities:', error);
+        console.error('Error fetching attributes:', error);
       });
   };
   
@@ -94,14 +94,14 @@
   
 
     const handleSortEnd = evt => {
-    const movedAmenity = amenities.value.splice(evt.oldIndex, 1)[0];
-    amenities.value.splice(evt.newIndex, 0, movedAmenity);
+    const movedAttribute = attributes.value.splice(evt.oldIndex, 1)[0];
+    attributes.value.splice(evt.newIndex, 0, movedAttribute);
 
     // Extract IDs in the new order
-    const idsInNewOrder = amenities.value.map(amenity => amenity.id);
+    const idsInNewOrder = attributes.value.map(attribute => attribute.id);
 
     // Send the updated order to the backend
-    axios.post('/api/amenities/update-sort-order', { ids: idsInNewOrder })
+    axios.post('/api/attributes/update-sort-order', { ids: idsInNewOrder })
         .then(response => {
         console.log(response.data.message); // Log success message
         })
@@ -110,7 +110,7 @@
         });
     };
 
-  const deleteAmenity = id => {
+  const deleteAttribute = id => {
     Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -121,21 +121,21 @@
       confirmButtonText: 'Yes, delete it!'
     }).then(result => {
       if (result.isConfirmed) {
-        axios.delete(`/api/amenities/${id}`)
+        axios.delete(`/api/attributes/${id}`)
           .then(() => {
-            amenities.value = amenities.value.filter(amenity => amenity.id !== id);
-            Swal.fire('Deleted!', 'Your amenity has been deleted.', 'success');
+            attributes.value = attributes.value.filter(attribute => attribute.id !== id);
+            Swal.fire('Deleted!', 'Your attribute has been deleted.', 'success');
           })
           .catch(error => {
-            Swal.fire('Error!', 'Failed to delete amenity.', 'error');
-            console.error('Error deleting amenity:', error);
+            Swal.fire('Error!', 'Failed to delete attribute.', 'error');
+            console.error('Error deleting attribute:', error);
           });
       }
     });
   };
   
   onMounted(() => {
-    fetchAmenities();
+    fetchAttributes();
   });
   </script>
   

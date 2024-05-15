@@ -42,7 +42,7 @@ class MediaController extends Controller
             'file_name' => $request->file('file')->hashName(),
             'mime_type' => $request->file('file')->getMimeType(),
             'size' => $request->file('file')->getSize(),
-            // Add custom_properties as needed
+            // Add custom_products as needed
             'model_id' => 0, // Adjust the model_id as needed
             'model_type' => 'App\Models\MediaManager', // Adjust the model_type as needed
         ]);
