@@ -93,48 +93,7 @@ const logout = () => {
                             :class="$route.path.startsWith('/admin/attributes') ? 'active' : ''" class="nav-link">
                             <i class="nav-icon fas fa-calendar-alt"></i>
                             <p>
-                                Colors
-                            </p>
-                        </router-link>
-                    </li>
-
-                    <li class="nav-item">
-                        <router-link to="/admin/features"
-                            :class="$route.path.startsWith('/admin/features') ? 'active' : ''" class="nav-link">
-                            <i class="nav-icon fas fa-calendar-alt"></i>
-                            <p>
-                                Material
-                            </p>
-                        </router-link>
-                    </li>
-
-                    <li class="nav-item">
-                        <router-link to="/admin/lineitems"
-                            :class="$route.path.startsWith('/admin/lineitems') ? 'active' : ''" class="nav-link">
-                            <i class="nav-icon fas fa-calendar-alt"></i>
-                            <p>
-                                Sizes
-                            </p>
-                        </router-link>
-                    </li>
-
-
-                    <li class="nav-item">
-                        <router-link to="/admin/bookings"
-                            :class="$route.path.startsWith('/admin/bookings') ? 'active' : ''" class="nav-link">
-                            <i class="nav-icon fas fa-calendar-alt"></i>
-                            <p>
-                                Orders
-                            </p>
-                        </router-link>
-                    </li>
-
-                    <li class="nav-item">
-                        <router-link to="/admin/appointments"
-                            :class="$route.path.startsWith('/admin/appointments') ? 'active' : ''" class="nav-link">
-                            <i class="nav-icon fas fa-calendar-alt"></i>
-                            <p>
-                                Inquiries
+                                Attributes
                             </p>
                         </router-link>
                     </li>

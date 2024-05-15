@@ -157,12 +157,12 @@ const handleFileChange = async (event) => {
                                     >
                                     <!-- You can create a select element for categories here -->
                                     <select
-                                        v-model="form.product_type_id"
+                                        v-model="form.category_id"
                                         id="product-type"
                                         class="form-control"
                                         :class="{
                                             'is-invalid':
-                                                errors.product_type_id,
+                                                errors.category_id,
                                         }"
                                     >
                                         <option value="" disabled>
@@ -178,7 +178,7 @@ const handleFileChange = async (event) => {
                                         </option>
                                     </select>
                                     <span class="invalid-feedback">{{
-                                        errors.product_type_id
+                                        errors.category_id
                                     }}</span>
                                 </div>
 

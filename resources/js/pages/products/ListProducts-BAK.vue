@@ -138,7 +138,7 @@ onMounted(() => {
                                                 <i class="fa fa-edit mr-2"></i>
                                             </router-link>
 
-                                            <a href="#" @click.prevent="deleteProduct(product.id)">
+                                            <a href="#" @click.prevent="deleteProducts(product.id)">
                                                 <i class="fa fa-trash text-danger"></i>
                                             </a>
                                         </td>

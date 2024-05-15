@@ -19,7 +19,7 @@ const form = reactive({
     description: "",
     attributes: [],
     price: "",
-    product_type_id: "",
+    category_id: "",
     excerpt: "",
     features: [],
     categories: [],
@@ -101,7 +101,7 @@ const getProduct = () => {
         form.slug = data.slug;
         form.item_code = data.item_code;
         form.description = data.description;
-        form.product_type_id = data.product_type_id;
+        form.category_id = data.category_id;
         form.excerpt = data.excerpt;
         form.attributes = data.associated_attributes;
         form.features = data.associated_features;

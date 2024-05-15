@@ -178,7 +178,7 @@ export default [
     {
         path: '/admin/attributes/:id/edit',
         name: 'admin.attributes.edit',
-        component: AmenitiesForm,
+        component: AttributesForm,
     },
 
 

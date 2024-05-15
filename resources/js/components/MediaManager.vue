@@ -68,7 +68,7 @@ onMounted(() => {
                     <div class="card border-0 " style="width:100%">
                         <div class="card-body">
 
-                            <h3 class="mb-4">Manage Files !!!</h3>
+                            <h3 class="mb-4">Manage Files</h3>
                             <hr />
                             <div class="col-lg-12">
                                 <!-- Iterate through available images -->

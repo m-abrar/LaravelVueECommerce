@@ -18,9 +18,9 @@ class ProductsController extends Controller
     public function index()
     {
         return Products::query()
-        ->with('type')
+        ->with('category')
         ->when(request('type'), function ($query) {
-            return $query->where('product_type_id', request('type'));
+            return $query->where('category_id', request('type'));
         })
             ->latest()
             ->paginate();
@@ -123,14 +123,14 @@ class ProductsController extends Controller
             'name' => 'required',
             'item_code' => 'required',
             'slug' => 'required',
-            'product_type_id' => 'required',
+            'category_id' => 'required',
             'excerpt' => 'required',
             'description' => 'required',
         ];
 
         // Validate the specific fields
         $request->validate($validationRules, [
-            'product_type_id.required' => 'The category field is required.',
+            'category_id.required' => 'The category field is required.',
         ]);
         // Update the model with all form fields
         $products->create($request->except(['attributes','features','lineitems']));
@@ -165,9 +165,9 @@ class ProductsController extends Controller
 
     public function edit(Products $products)
     {
-        $products->load('services')->load('lineitems')->load('neighbours')->load('rooms')->load('prices')->load('bookings');
+        // $products->load('services')->load('lineitems')->load('neighbours')->load('rooms')->load('prices')->load('bookings');
         $products['associated_attributes'] = $products->attributes->pluck('id');
-        $products['associated_features'] = $products->features->pluck('id');
+        // $products['associated_features'] = $products->features->pluck('id');
         $products['associated_categories'] = $products->categories->pluck('id');
 
         return $products;
@@ -180,14 +180,14 @@ class ProductsController extends Controller
             'name' => 'required',
             'item_code' => 'required',
             'slug' => 'required',
-            'product_type_id' => 'required',
+            'category_id' => 'required',
             'excerpt' => 'required',
             'description' => 'required',
         ];
 
         // Validate the specific fields
         $request->validate($validationRules, [
-            'product_type_id.required' => 'The category field is required.',
+            'category_id.required' => 'The category field is required.',
         ]);
         // Update the model with all form fields
         $products->update($request->except(['attributes','features','categories']));
@@ -195,7 +195,7 @@ class ProductsController extends Controller
         // Use the sync method to update the selected attributes
         $products->attributes()->sync($request->input('attributes', []));
         // Use the sync method to update the selected features
-        $products->features()->sync($request->input('features', []));
+        // $products->features()->sync($request->input('features', []));
         // Use the sync method to update the selected features
         $products->categories()->sync($request->input('categories', []));
 

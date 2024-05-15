@@ -27,12 +27,12 @@ class Products extends Model
     //     return $this->belongsTo(Client::class);
     // }
 
-    public function formattedStartTime(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->created_at->format('Y-m-d h:i A'),
-        );
-    }
+    // public function formattedStartTime(): Attribute
+    // {
+    //     return Attribute::make(
+    //         get: fn () => $this->created_at->format('Y-m-d h:i A'),
+    //     );
+    // }
 
     public function formattedEndTime(): Attribute
     {
@@ -41,54 +41,54 @@ class Products extends Model
         );
     }
 
-    public function type()
+    public function category()
     {
         return $this->belongsTo(Categories::class, 'category_id');
     }
 
     public function attributes()
     {
-        return $this->belongsToMany(Attributes::class, 'category_attribute_pivot', 'category_id', 'attribute_id');
+        return $this->belongsToMany(Attributes::class, 'product_attribute_pivot', 'product_id', 'attribute_id');
     }
 
-    public function features()
-    {
-        return $this->belongsToMany(Features::class, 'category_feature_pivot', 'category_id', 'feature_id');
-    }
+    // public function features()
+    // {
+    //     return $this->belongsToMany(Features::class, 'category_feature_pivot', 'category_id', 'feature_id');
+    // }
 
     public function categories()
     {
-        return $this->belongsToMany(Categories::class, 'category_category_pivot', 'category_id', 'category_id');
+        return $this->belongsToMany(Categories::class, 'product_category_pivot', 'product_id', 'category_id');
     }
 
-    public function lineitems()
-    {
-        return $this->hasMany(CategoryLineItem::class, 'category_id');
-    }
+    // public function lineitems()
+    // {
+    //     return $this->hasMany(CategoryLineItem::class, 'category_id');
+    // }
 
-    public function services()
-    {
-        return $this->hasMany(CategoryService::class, 'category_id');
-    }
+    // public function services()
+    // {
+    //     return $this->hasMany(CategoryService::class, 'category_id');
+    // }
 
-    public function neighbours()
-    {
-        return $this->hasMany(CategoryNeighbour::class, 'category_id');
-    }
+    // public function neighbours()
+    // {
+    //     return $this->hasMany(CategoryNeighbour::class, 'category_id');
+    // }
 
-    public function rooms()
-    {
-        return $this->hasMany(CategoryRoom::class, 'category_id');
-    }
+    // public function rooms()
+    // {
+    //     return $this->hasMany(CategoryRoom::class, 'category_id');
+    // }
 
-    public function prices()
-    {
-        return $this->hasMany(CategoryPrice::class, 'category_id');
-    }
+    // public function prices()
+    // {
+    //     return $this->hasMany(CategoryPrice::class, 'category_id');
+    // }
 
-    public function bookings()
-    {
-        return $this->hasMany(Booking::class, 'category_id');
-    }
+    // public function bookings()
+    // {
+    //     return $this->hasMany(Booking::class, 'category_id');
+    // }
 
 }

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('item_code', 25)->nullable();
             $table->string('name');
             $table->string('slug', 255)->unique();
-            $table->integer('product_type_id');
+            $table->integer('category_id');
             $table->text('excerpt')->nullable();
             $table->blob('description')->nullable();
             $table->decimal('price', 10, 2)->nullable();
