@@ -21,11 +21,10 @@ const form = reactive({
     price: "",
     category_id: "",
     excerpt: "",
-    features: [],
     categories: [],
     image: "placeholder.png", // Default image
     image_id: "",
-    display_order: "",
+    sort_order: "",
     is_active: true, // Set default value
     is_featured: false,
     is_new: true,
@@ -74,12 +73,7 @@ const getAvailableCategories = () => {
     });
 };
 
-const locations = ref();
-const getAvailableLocations = () => {
-    axios.get("/api/locations").then((response) => {
-        locations.value = response.data;
-    });
-};
+
 
 const availableAttributes = ref();
 const getAvailableAttributes = () => {
@@ -87,12 +81,7 @@ const getAvailableAttributes = () => {
         availableAttributes.value = response.data;
     });
 };
-const availableFeatures = ref();
-const getAvailableFeatures = () => {
-    axios.get("/api/features").then((response) => {
-        availableFeatures.value = response.data;
-    });
-};
+
 const availableCategories = ref();
 
 const getProduct = () => {
@@ -108,7 +97,7 @@ const getProduct = () => {
         form.categories = data.associated_categories;
         form.image = data.image;
         form.image_id = data.image_id;
-        form.display_order = data.display_order;
+        form.sort_order = data.sort_order;
         form.is_active = data.is_active ? true : false;
         form.is_featured = data.is_featured ? true : false;
         form.is_new = data.is_new ? true : false;
@@ -131,9 +120,7 @@ onMounted(() => {
         dateFormat: "Y-m-d h:i K",
         defaultHour: 10,
     });
-    getAvailableLocations();
     getAvailableAttributes();
-    getAvailableFeatures();
     getAvailableCategories();
 });
 </script>
@@ -239,15 +226,18 @@ onMounted(() => {
 
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="display_order">Display Order</label>
-                                                    <input v-model="form.display_order
-                                                        " type="number" class="form-control" :class="{
-                                                            'is-invalid':
-                                                                errors.display_order,
-                                                        }" id="display_order" />
-                                                    <span class="invalid-feedback">{{
-                                                        errors.display_order
-                                                    }}</span>
+                                                    <label for="categoryId">Category</label>
+                                                    <!-- You can create a select element for property types here -->
+                                                    <select v-model="form.category_id" id="categoryId"
+                                                        class="form-control"
+                                                        :class="{ 'is-invalid': errors.category_id }">
+                                                        <option value="" disabled>Select Property Type</option>
+                                                        <!-- Populate options based on categories -->
+                                                        <option v-for="category in availableCategories"
+                                                            :value="category.id" :key="category.id">{{
+                                                                category.name }}</option>
+                                                    </select>
+                                                    <span class="invalid-feedback">{{ errors.category_id }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -436,26 +426,6 @@ onMounted(() => {
                                                     <span class="invalid-feedback">{{
                                                         errors.description
                                                     }}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Tab Pan-->
-                                    <div class="tab-pane" id="attributes">
-                                        <h3 class="text-center">Attributes</h3>
-                                        <div class="row">
-                                            <div class="col-lg-12">
-                                                <div class="form-group">
-                                                    <!-- Iterate through available features -->
-                                                    <div class="checkbox-item col-lg-3 col-md-4 col-sm-6 col-sm-12"
-                                                        v-for="feature in availableFeatures" :key="feature.id">
-                                                        <label class="checkbox-label">
-                                                            <input type="checkbox" v-model="form.features
-                                                                " :value="feature.id
-                                                                    " name="features[]" />
-                                                            {{ feature.name }}
-                                                        </label>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

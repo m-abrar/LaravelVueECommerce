@@ -2,6 +2,7 @@
 import { onMounted, ref, computed } from 'vue';
 import Swal from 'sweetalert2';
 import axios from 'axios';
+import Sortable from 'sortablejs';
 
 const selectedType = ref();
 const categories = ref([]);
@@ -10,7 +11,6 @@ const productsList = ref([]);
 const getCategories = () => {
     axios.get('/api/categories/withcount')
         .then((response) => {
-            console.log('response');
             categories.value = response.data;
         })
 };
@@ -62,9 +62,37 @@ const deleteProduct = (id) => {
     })
 };
 
+const initSortable = () => {
+    const table = document.querySelector('.table tbody');
+    if (table) {
+        new Sortable(table, {
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            onEnd: handleSortEnd,
+        });
+    }
+};
+
+const handleSortEnd = (evt) => {
+    const movedItem = productsList.value.data.splice(evt.oldIndex, 1)[0];
+    productsList.value.data.splice(evt.newIndex, 0, movedItem);
+
+    const idsInNewOrder = productsList.value.data.map((product) => product.id);
+
+    // Send the updated order to the backend
+    axios.post('/api/products/update-sort-order', { ids: idsInNewOrder })
+        .then((response) => {
+            console.log(response.data.message); // Log success message
+        })
+        .catch((error) => {
+            console.error('Error updating sort order:', error); // Log error
+        });
+};
+
 onMounted(() => {
     getProducts();
     getCategories();
+    initSortable();
 });
 </script>
 <template>
@@ -108,8 +136,6 @@ onMounted(() => {
                             </button>
                         </div>
                     </div>
-
-
 
                     <div class="card">
                         <div class="card-body">

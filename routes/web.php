@@ -156,6 +156,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/products/{products}/edit', [ProductsController::class, 'edit']);
     Route::put('/api/products/{products}/edit', [ProductsController::class, 'update']);
     Route::delete('/api/products/{products}', [ProductsController::class, 'destroy']);
+    Route::post('/api/products/update-sort-order', [ProductsController::class, 'updateSortOrder']);
 
     Route::get('/api/attributes', [AttributesController::class, 'index']);
     Route::post('/api/attributes/create', [AttributesController::class, 'store']);

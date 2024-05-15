@@ -18,13 +18,15 @@ class ProductsController extends Controller
     public function index()
     {
         return Products::query()
-        ->with('category')
-        ->when(request('type'), function ($query) {
-            return $query->where('category_id', request('type'));
-        })
+            ->with('category')
+            ->when(request('type'), function ($query) {
+                return $query->where('category_id', request('type'));
+            })
+            ->orderBy('sort_order') // Add this line to order by sort_order
             ->latest()
             ->paginate();
     }
+
 
     public function getAllMedia($product_id)
     {
@@ -123,7 +125,7 @@ class ProductsController extends Controller
             'name' => 'required',
             'item_code' => 'required',
             'slug' => 'required',
-            'category_id' => 'required',
+            // 'category_id' => 'required',
             'excerpt' => 'required',
             'description' => 'required',
         ];
@@ -180,14 +182,14 @@ class ProductsController extends Controller
             'name' => 'required',
             'item_code' => 'required',
             'slug' => 'required',
-            'category_id' => 'required',
+            // 'category_id' => 'required',
             'excerpt' => 'required',
             'description' => 'required',
         ];
 
         // Validate the specific fields
         $request->validate($validationRules, [
-            'category_id.required' => 'The category field is required.',
+            // 'category_id.required' => 'The category field is required.',
         ]);
         // Update the model with all form fields
         $products->update($request->except(['attributes','features','categories']));
@@ -209,5 +211,16 @@ class ProductsController extends Controller
         $products->delete();
 
         return response()->json(['success' => true], 200);
+    }
+
+    public function updateSortOrder(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        foreach ($ids as $index => $id) {
+            Products::where('id', $id)->update(['sort_order' => $index + 1]);
+        }
+
+        return response()->json(['message' => 'Sort order updated successfully']);
     }
 }
