@@ -14,8 +14,10 @@ import ListCategories from './pages/categories/ListCategories.vue';
 import CategoryForm from './pages/categories/Categoryform.vue';
 import ListAmenities from './pages/amenities/ListAmenities.vue';
 import ListAttributes from './pages/attributes/ListAttributes.vue';
+import ListAttributeValues from './pages/attributevalues/ListAttributeValues.vue';
 import AmenitiesForm from './pages/amenities/AmenitiesForm.vue';
 import AttributesForm from './pages/attributes/AttributesForm.vue';
+import AttributeValuesForm from './pages/attributevalues/AttributeValuesForm.vue';
 import ListFeatures from './pages/features/ListFeatures.vue';
 import FeaturesForm from './pages/features/FeaturesForm.vue';
 import ListServices from './pages/services/ListServices.vue';
@@ -179,6 +181,25 @@ export default [
         path: '/admin/attributes/:id/edit',
         name: 'admin.attributes.edit',
         component: AttributesForm,
+    },
+
+
+    {
+        path: '/admin/attributevalues',
+        name: 'admin.attributevalues',
+        component: ListAttributeValues,
+    },
+
+    {
+        path: '/admin/attributevalues/create',
+        name: 'admin.attributevalues.create',
+        component: AttributeValuesForm,
+    },
+
+    {
+        path: '/admin/attributevalues/:id/edit',
+        name: 'admin.attributevalues.edit',
+        component: AttributeValuesForm,
     },
 
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\CategoriesController;
 use App\Http\Controllers\Admin\AmenitiesController;
 use App\Http\Controllers\Admin\AttributesController;
+use App\Http\Controllers\Admin\AttributeValuesController;
 use App\Http\Controllers\Admin\LocationsController;
 use App\Http\Controllers\Admin\FeaturesController;
 use App\Http\Controllers\Admin\ServicesController;
@@ -94,6 +95,12 @@ Route::prefix('/api/attribute/{attribute_id}/media')->name('api.attribute.media.
     Route::get('/add-remove/{media_id}', [AttributesController::class, 'addOrRemoveMedia'])->name('add-remove');
 });
 
+Route::prefix('/api/attributevalue/{attribute_value_id}/media')->name('api.attributevalue.media.')->group(function () {
+    Route::get('/all', [AttributeValuesController::class, 'getAllMedia'])->name('index');
+    Route::get('/featured-update/{media_id}', [AttributeValuesController::class, 'featuredUpdate'])->name('featured-update');
+    Route::get('/add-remove/{media_id}', [AttributeValuesController::class, 'addOrRemoveMedia'])->name('add-remove');
+});
+
 Route::prefix('/api/category/{category_id}/media')->name('api.category.media.')->group(function () {
     Route::get('/all', [CategoriesController::class, 'getAllMedia'])->name('index');
     Route::get('/featured-update/{media_id}', [CategoriesController::class, 'featuredUpdate'])->name('featured-update');
@@ -166,6 +173,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('/api/attributes/{attributes}', [AttributesController::class, 'destroy']);
     Route::post('/api/attributes/upload-image', [AttributesController::class, 'uploadImage']);
     Route::post('/api/attributes/update-sort-order', [AttributesController::class, 'updateSortOrder']);
+
+    Route::get('/api/attributevalues', [AttributeValuesController::class, 'index']);
+    Route::post('/api/attributevalues/create', [AttributeValuesController::class, 'store']);
+    Route::get('/api/attributevalues/withcount', [AttributeValuesController::class, 'getTypesWithCount']);
+    Route::get('/api/attributevalues/{attributevalues}/edit', [AttributeValuesController::class, 'edit']);
+    Route::put('/api/attributevalues/{attributevalues}/edit', [AttributeValuesController::class, 'update']);
+    Route::delete('/api/attributevalues/{attributevalues}', [AttributeValuesController::class, 'destroy']);
+    Route::post('/api/attributevalues/upload-image', [AttributeValuesController::class, 'uploadImage']);
+    Route::post('/api/attributevalues/update-sort-order', [AttributeValuesController::class, 'updateSortOrder']);
 
     Route::get('/api/amenities', [AmenitiesController::class, 'index']);
     Route::post('/api/amenities/create', [AmenitiesController::class, 'store']);

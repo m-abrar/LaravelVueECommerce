@@ -2,24 +2,22 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Attributes;
+use App\Models\AttributeValues;
 use App\Http\Controllers\Controller;
 use App\Models\Products;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class AttributesController extends Controller
+class AttributeValuesController extends Controller
 {
     public function index()
     {
-        // return Attributes::all();
-        return Attributes::with('attributeValues')->orderBy('sort_order')->get();
+        return AttributeValues::with('attribute')->orderBy('sort_order')->get();
     }
-
 
     public function getAllMedia($attribute_id)
     {
-        $attribute = Attributes::findOrFail($attribute_id);
+        $attribute = AttributeValues::findOrFail($attribute_id);
 
         $featuredMediaFile = $attribute->mediaFiles()
             ->wherePivot('is_featured', true)
@@ -46,7 +44,7 @@ class AttributesController extends Controller
 
     public function featuredUpdate($attribute_id, $media_id)
     {
-        $attribute = Attributes::findOrFail($attribute_id);
+        $attribute = AttributeValues::findOrFail($attribute_id);
 
         $mediaIds = $attribute->mediaFiles()->pluck('media_id')->toArray();
 
@@ -61,7 +59,7 @@ class AttributesController extends Controller
 
     public function addOrRemoveMedia($attribute_id, $media_id)
     {
-        $attribute = Attributes::findOrFail($attribute_id);
+        $attribute = AttributeValues::findOrFail($attribute_id);
 
         $existingMedia = $attribute->mediaFiles()->find($media_id);
 
@@ -74,37 +72,38 @@ class AttributesController extends Controller
         }
     }
 
-
     public function store(Request $request)
     {
         $validated = request()->validate([
             'name' => 'required',
+            'attribute_id' => 'required',
         ]);
 
-        Attributes::create([
+        AttributeValues::create([
+            'attribute_id' => $validated['attribute_id'],
             'name' => $validated['name'],
             'description' => $request->description,
-            'display_type' => $request->display_type,
             'image' => $request->image_created,
         ]);
         return response()->json(['message' => 'success']);
     }
 
-    public function edit(Attributes $attributes)
+    public function edit(AttributeValues $attributevalues)
     {
-        return $attributes;
+        return $attributevalues;
     }
 
-    public function update(Request $request, Attributes $attributes)
+    public function update(Request $request, AttributeValues $attributevalues)
     {
         $validated = request()->validate([
+            'attribute_id' => 'required',
             'name' => 'required',
         ]);
 
-        $attributes->update([
+        $attributevalues->update([
+            'attribute_id' => $validated['attribute_id'],
             'name' => $validated['name'],
             'description' => $request->description,
-            'display_type' => $request->display_type,
         ]);
 
         return response()->json(['success' => true]);
@@ -112,40 +111,33 @@ class AttributesController extends Controller
 
     public function uploadImage(Request $request)
     {
-        // Validate the uploaded file
         $request->validate([
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust the validation rules as needed
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($request->file('image')) {
             $link = Storage::disk('public')->put('/images', $request->file('image'));
 
-            // // $file = $request->file('image');
-            // // $filename = $file->getClientOriginalName(); // Use the original filename or generate a unique one
-            // Store the image in the 'public' disk under the 'images' directory
-            // // Storage::disk('public')->put('images/' . $filename, file_get_contents($file));
-            // You can save the image file path in your database if needed
-            Attributes::where('id', $request->id)->update(['image' => $link]);
+            AttributeValues::where('id', $request->id)->update(['image' => $link]);
             return response()->json(['success' => true, 'image_created' => $link]);
         } else {
             return response()->json(['success' => false, 'message' => 'No file uploaded.']);
         }
     }
 
-    public function destroy(Attributes $attributes)
+    public function destroy(AttributeValues $attributevalues)
     {
-        $attributes->delete();
+        $attributevalues->delete();
 
         return response()->json(['success' => true], 200);
     }
-
 
     public function updateSortOrder(Request $request)
     {
         $ids = $request->input('ids');
 
         foreach ($ids as $index => $id) {
-            Attributes::where('id', $id)->update(['sort_order' => $index + 1]);
+            AttributeValues::where('id', $id)->update(['sort_order' => $index + 1]);
         }
 
         return response()->json(['message' => 'Sort order updated successfully']);

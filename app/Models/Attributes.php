@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 use App\Traits\MediaFile;
 
@@ -62,5 +63,10 @@ class Attributes extends Model
     public function products()
     {
         return $this->belongsToMany(Products::class, 'product_attribute_pivot', 'attribute_id', 'product_id');
+    }
+
+    public function attributeValues(): HasMany
+    {
+        return $this->hasMany(AttributeValues::class, 'attribute_id');
     }
 }

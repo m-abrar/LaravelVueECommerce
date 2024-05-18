@@ -4,69 +4,77 @@ import { reactive, onMounted, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useToastr } from '@/toastr';
 import { Form } from 'vee-validate';
-import AttributesFormPictures from "./AttributesFormPictures.vue"; // Import the child component
+import AttributeValuesFormPictures from "./AttributeValuesFormPictures.vue"; // Import the child component
 
 const router = useRouter();
 const route = useRoute();
 const toastr = useToastr();
 const form = reactive({
+    attribute_id: '',
     name: '',
     description: '',
     image: null, // For the file input
-    display_type: 'checkbox', // Add display_type to form data
-    attributes: [], // Assuming you have some attributes to display
 });
 
 const handleSubmit = (values, actions) => {
     if (editMode.value) {
-        editCategory(values, actions);
+        editAttributeValue(values, actions);
     } else {
-        createCategory(values, actions);
+        createAttributeValue(values, actions);
     }
 };
 
-const createCategory = (values, actions) => {
-    axios.post('/api/attributes/create', form)
+const createAttributeValue = (values, actions) => {
+    axios.post('/api/attributevalues/create', form)
         .then((response) => {
-            router.push('/admin/attributes');
-            toastr.success('Attribute created successfully!');
+            router.push('/admin/attributevalues');
+            toastr.success('Attribute Value created successfully!');
         })
         .catch((error) => {
             actions.setErrors(error.response.data.errors);
         })
 };
 
-const editCategory = (values, actions) => {
-    axios.put(`/api/attributes/${route.params.id}/edit`, form)
+const editAttributeValue = (values, actions) => {
+    axios.put(`/api/attributevalues/${route.params.id}/edit`, form)
         .then((response) => {
-            router.push('/admin/attributes');
-            toastr.success('Attribute updated successfully!');
+            router.push('/admin/attributevalues');
+            toastr.success('Attribute Value updated successfully!');
         })
         .catch((error) => {
             actions.setErrors(error.response.data.errors);
         })
 };
 
-const getCategory = () => {
-    axios.get(`/api/attributes/${route.params.id}/edit`)
+const getAttributeValue = () => {
+    axios.get(`/api/attributevalues/${route.params.id}/edit`)
         .then(({ data }) => {
+            console.log(data);
             form.id = data.id;
+            form.attribute_id = data.attribute_id;
             form.name = data.name;
-            form.display_type = data.display_type;
             form.description = data.description;
             form.image = data.image;
             form.image_created = null;
-            form.attributes = data.attributes; // Load existing attributes
         })
+};
+
+const availableAttributes = ref([]);
+
+const getAvailableAttributes = () => {
+    axios.get("/api/attributes").then((response) => {
+        availableAttributes.value = response.data;
+    });
 };
 
 const editMode = ref(false);
 
 onMounted(() => {
-    if (route.name === 'admin.attributes.edit') {
+    if (route.name === 'admin.attributevalues.edit') {
         editMode.value = true;
-        getCategory();
+        getAttributeValue();
     }
+    getAvailableAttributes();
 });
 
 const fileInput = ref(null);
@@ -85,8 +93,9 @@ const handleFileChange = async (event) => {
     formData.append('id', form.id);
 
     // Send the FormData to your server for processing
-    axios.post('/api/attributes/upload-image', formData)
+    axios.post('/api/attributevalues/upload-image', formData)
         .then((response) => {
+            console.log(response);
             form.image_created = response.data.image_created;
             toastr.success('Image uploaded successfully!');
         })
@@ -96,7 +105,7 @@ const handleFileChange = async (event) => {
 };
 </script>
 
-<template>
+<template> 
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
@@ -104,7 +113,7 @@ const handleFileChange = async (event) => {
                     <h1 class="m-0">
                         <span v-if="editMode">Edit</span>
                         <span v-else>Create</span>
-                        Attribute
+                        Attribute Value
                     </h1>
                 </div>
                 <div class="col-sm-6">
@@ -113,7 +122,7 @@ const handleFileChange = async (event) => {
                             <router-link to="/admin/dashboard">Home</router-link>
                         </li>
                         <li class="breadcrumb-item">
-                            <router-link to="/admin/attributes">Attribute</router-link>
+                            <router-link to="/admin/attributevalues">Attribute Value</router-link>
                         </li>
                         <li class="breadcrumb-item active">
                             <span v-if="editMode">Edit</span>
@@ -133,6 +142,20 @@ const handleFileChange = async (event) => {
                         <div class="card-body">
                             <Form @submit="handleSubmit" v-slot="{ errors }">
                                 <div class="form-group">
+                                    <label for="attributeId">Attribute</label>
+                                    <!-- You can create a select element for property types here -->
+                                    <select v-model="form.attribute_id" id="attributeId"
+                                        class="form-control"
+                                        :class="{ 'is-invalid': errors.attribute_id }">
+                                        <option value="" disabled>Select Attribue</option>
+                                        <!-- Populate options based on availableAttributes -->
+                                        <option v-for="attribute in availableAttributes"
+                                            :value="attribute.id" :key="attribute.id">{{
+                                                attribute.name }}</option>
+                                    </select>
+                                    <span class="invalid-feedback">{{ errors.attribute_id }}</span>
+                                </div>
+                                <div class="form-group">
                                     <label for="name">Name</label>
                                     <input v-model="form.name" type="text" class="form-control"
                                         :class="{ 'is-invalid': errors.name }" id="name" placeholder="Enter Name">
@@ -145,15 +168,6 @@ const handleFileChange = async (event) => {
                                         placeholder="Enter Description"></textarea>
                                     <span class="invalid-feedback">{{ errors.description }}</span>
                                 </div>
-
-                                <div class="form-group">
-                                    <label for="display_type">Display Type</label>
-                                    <select v-model="form.display_type" class="form-control" id="display_type">
-                                        <option value="checkbox">Checkboxes</option>
-                                        <option value="radio">Radio Buttons</option>
-                                    </select>
-                                </div>
-
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </Form>
                         </div>
@@ -162,5 +176,5 @@ const handleFileChange = async (event) => {
             </div>
         </div>
     </div>
-    <attributes-form-pictures></attributes-form-pictures>
+    <attributevalues-form-pictures></attributevalues-form-pictures>
 </template>
