@@ -65,7 +65,7 @@ const editProduct = (values, actions) => {
         });
 };
 
-const categories = ref();
+const availableCategories = ref([]);
 
 const getAvailableCategories = () => {
     axios.get("/api/categories").then((response) => {
@@ -73,16 +73,12 @@ const getAvailableCategories = () => {
     });
 };
 
-
-
 const availableAttributes = ref();
 const getAvailableAttributes = () => {
     axios.get("/api/attributes").then((response) => {
         availableAttributes.value = response.data;
     });
 };
-
-const availableCategories = ref();
 
 const getProduct = () => {
     axios.get(`/api/products/${route.params.id}/edit`).then(({ data }) => {
@@ -171,6 +167,9 @@ onMounted(() => {
                                             Details</a>
                                     </li>
                                     <li class="nav-item">
+                                        <a class="nav-link" href="#categories" data-toggle="tab">Categories</a>
+                                    </li>
+                                    <li class="nav-item">
                                         <a class="nav-link" href="#address" data-toggle="tab">SEO</a>
                                     </li>
                                     <li class="nav-item">
@@ -228,16 +227,23 @@ onMounted(() => {
                                                 <div class="form-group">
                                                     <label for="categoryId">Category</label>
                                                     <!-- You can create a select element for property types here -->
-                                                    <select v-model="form.category_id" id="categoryId"
-                                                        class="form-control"
-                                                        :class="{ 'is-invalid': errors.category_id }">
-                                                        <option value="" disabled>Select Property Type</option>
+                                                    <select v-model="form.category_id
+                                                        " id="categoryId" class="form-control" :class="{
+                                                            'is-invalid':
+                                                                errors.category_id,
+                                                        }">
+                                                        <option value="" disabled>
+                                                            Select Property Type
+                                                        </option>
                                                         <!-- Populate options based on categories -->
                                                         <option v-for="category in availableCategories"
-                                                            :value="category.id" :key="category.id">{{
-                                                                category.name }}</option>
+                                                            :value="category.id" :key="category.id">
+                                                            {{ category.name }}
+                                                        </option>
                                                     </select>
-                                                    <span class="invalid-feedback">{{ errors.category_id }}</span>
+                                                    <span class="invalid-feedback">{{
+                                                        errors.category_id
+                                                    }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -318,25 +324,46 @@ onMounted(() => {
                                             </div>
                                         </div>
 
-                                        <h3 class="text-center">Categories</h3>
 
-                                        <div class="row">
-                                            <div class="col-lg-12">
-                                                <div class="form-group">
-                                                    <!-- Iterate through available categories -->
-                                                    <div class="checkbox-item col-lg-3 col-md-4 col-sm-6 col-sm-12"
-                                                        v-for="category in availableCategories" :key="category.id">
-                                                        <label class="checkbox-label">
-                                                            <input type="checkbox" v-model="form.categories
-                                                                " :value="category.id
-                                                                    " name="categories[]" />
-                                                            {{ category.name }}
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+
                                     </div>
+
+
+                                    
+                                    <!-- Categories Tab Pane -->
+<div class="tab-pane" id="categories">
+    <h3 class="text-center">Categories</h3>
+    <div  style="display:flex; justify-content: center;">
+    <div class="col-md-3">
+        <div class="form-group" style="max-height: 500px; overflow-y: auto;">
+            <!-- Iterate over each category -->
+            <template v-for="category in availableCategories" :key="category.id">
+                <!-- Parent category -->
+                <div>
+                    <label class="checkbox-label">
+                        <input type="checkbox" v-model="form.categories" :value="category.id" name="categories[]" />
+                        {{ category.name }}
+                    </label>
+                    <!-- Indent children under their parent -->
+                    <template v-if="category.children && category.children.length > 0">
+                        <div v-for="child in category.children" :key="child.id" class="ml-3">
+                            <label class="checkbox-label">
+                                <input type="checkbox" v-model="form.categories" :value="child.id" name="categories[]" />
+                                {{ child.name }}
+                            </label>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </div>
+</div>
+</div>
+
+
+
+
+
                                     <!-- Tab Pan-->
                                     <div class="tab-pane" id="address">
                                         <h3 class="text-center">SEO</h3>
@@ -431,21 +458,54 @@ onMounted(() => {
                                         </div>
                                     </div>
                                     <!-- Tab Pan-->
+
                                     <div class="tab-pane" id="attributes">
-                                        <h3 class="text-center">Attributes</h3>
+                                        <h5 class="text-center mb-3">
+                                            Attributes
+                                        </h5>
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <div class="form-group">
-                                                    <!-- Iterate through available attributes -->
-                                                    <div class="checkbox-item col-lg-3 col-md-4 col-sm-6 col-sm-12"
-                                                        v-for="attribute in availableAttributes" :key="attribute.id">
-                                                        <label class="checkbox-label">
-                                                            <input type="checkbox" v-model="form.attributes
-                                                                " :value="attribute.id
-                                                                    " name="attributes[]" />
-                                                            {{ attribute.name }}
-                                                        </label>
-                                                    </div>
+                                                    <template v-for="attribute in availableAttributes">
+                                                        <div class="border p-3 mb-3">
+                                                            <div class="row">
+                                                                <div class="col-md-3">
+                                                                    <h5>
+                                                                        {{
+                                                                            attribute.name
+                                                                        }}
+                                                                    </h5>
+                                                                </div>
+                                                                <div class="col-md-9">
+                                                                    <!-- Iterate through attribute values -->
+                                                                    <div v-if="
+                                                                        attribute.display_type ===
+                                                                        'checkbox'
+                                                                    " v-for="value in attribute.attribute_values">
+                                                                        <label class="checkbox-label">
+                                                                            <input type="checkbox"
+                                                                                name="attribute_values[]" />
+                                                                            {{
+                                                                                value.name
+                                                                            }}
+                                                                        </label>
+                                                                    </div>
+                                                                    <div v-else-if="
+                                                                        attribute.display_type ===
+                                                                        'radio'
+                                                                    " v-for="value in attribute.attribute_values">
+                                                                        <label class="radio-label">
+                                                                            <input type="radio"
+                                                                                name="attribute_values[]" />
+                                                                            {{
+                                                                                value.name
+                                                                            }}
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </template>
                                                 </div>
                                             </div>
                                         </div>
@@ -474,11 +534,79 @@ onMounted(() => {
     float: left;
 }
 
-.checkbox-label {
+.checkbox-label,
+.radio-label {
     font-weight: normal !important;
 }
 
 .checkbox-label input[type="checkbox"] {
     margin-right: 8px;
+}
+
+/* Scoped styles for the Multiselect component */
+.multiselect {
+    width: 100%;
+}
+
+.multiselect__tags {
+    margin-top: 5px;
+}
+
+.multiselect__tags input {
+    height: auto;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 5px 10px;
+}
+
+.multiselect__option {
+    padding: 10px;
+}
+
+.multiselect__option--highlight {
+    background-color: #f0f0f0;
+}
+
+.multiselect__option--disabled {
+    opacity: 0.5;
+}
+
+.multiselect__option--selected {
+    background-color: #007bff;
+    color: white;
+}
+
+.multiselect__option--selected:hover {
+    background-color: #0056b3;
+}
+
+.multiselect__option:hover {
+    background-color: #f0f0f0;
+}
+
+/* Custom styles for the selected tags */
+.multiselect__tag {
+    margin-top: 5px;
+    margin-right: 5px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 3px 8px;
+    display: inline-block;
+}
+
+.multiselect__tag:hover {
+    cursor: pointer;
+}
+
+.multiselect__tag .multiselect__tag-icon {
+    font-size: 12px;
+    cursor: pointer;
+    color: #fff;
+}
+
+.multiselect__tag-icon:hover {
+    color: #ccc;
 }
 </style>
