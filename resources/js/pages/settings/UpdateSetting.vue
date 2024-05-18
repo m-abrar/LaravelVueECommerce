@@ -56,6 +56,10 @@ onMounted(() => {
                                 aria-controls="general" aria-selected="true">General</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" id="seo-tab" data-toggle="tab" href="#seo" role="tab"
+                                aria-controls="seo" aria-selected="true">SEO</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab"
                                 aria-controls="contact" aria-selected="false">Contact</a>
                         </li>
@@ -116,22 +120,59 @@ onMounted(() => {
                                         </div>
                                         <div class="form-group">
                                             <label for="paginationLimit">Pagination Limit</label>
-                                            <input v-model="settings.pagination_limit" type="text" class="form-control"
+                                            <input v-model="settings.pagination_limit" type="number" class="form-control"
                                                 id="paginationLimit" placeholder="Enter pagination limit" />
                                             <span class="text-danger text-sm"
                                                 v-if="errors && errors.pagination_limit">{{
                                                     errors.pagination_limit[0] }}</span>
                                         </div>
+                                        
+                                    </div>
+                                    <div class="card-footer">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa fa-save mr-1"></i>Save Changes
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- General settings tab -->
+                        <div class="tab-pane fade" id="seo" role="tabpanel"
+                            aria-labelledby="seo-tab">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">SEO & Other Settings</h3>
+                                </div>
+                                <form @submit.prevent="updateSettings()">
+                                    <div class="card-body">
+                                        
                                         <div class="form-group">
+                                            <label for="keywords">Keywords</label>
+                                            <input v-model="settings.keywords" type="text" class="form-control"
+                                                id="keywords" placeholder="Enter keywords" />
+                                            <span class="text-danger text-sm"
+                                                v-if="errors && errors.keywords">{{
+                                                    errors.keywords[0] }}</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="description">Description</label>
+                                            <input v-model="settings.description" type="text" class="form-control"
+                                                id="description" placeholder="Enter page description" />
+                                            <span class="text-danger text-sm"
+                                                v-if="errors && errors.description">{{
+                                                    errors.description[0] }}</span>
+                                        </div>
+                                        <div class="form-group"> // TODO apply rich text editor or wysiwyg
                                             <label for="copyright">Copyright</label>
                                             <input v-model="settings.copyright" type="text" class="form-control"
                                                 id="copyright" placeholder="Enter copyright" />
                                         </div>
-                                        <div class="form-group">
+                                        <div class="form-group"> // TODO apply rich text editor or wysiwyg
                                             <label for="designedBy">Designed By</label>
                                             <input v-model="settings.designedBy" type="text" class="form-control"
                                                 id="designedBy" placeholder="Enter designer name" />
                                         </div>
+
                                     </div>
                                     <div class="card-footer">
                                         <button type="submit" class="btn btn-primary">
