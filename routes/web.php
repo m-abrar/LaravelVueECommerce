@@ -151,6 +151,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/api/categories', [CategoriesController::class, 'index']);
     Route::get('/api/categories/parents', [CategoriesController::class, 'indexParents']);
+    Route::get('/api/categories/parents/children', [CategoriesController::class, 'indexParentsChildren']);
     Route::post('/api/categories/create', [CategoriesController::class, 'store']);
     Route::get('/api/categories/withcount', [CategoriesController::class, 'getTypesWithCount']);
     Route::get('/api/categories/{category}/edit', [CategoriesController::class, 'edit']);

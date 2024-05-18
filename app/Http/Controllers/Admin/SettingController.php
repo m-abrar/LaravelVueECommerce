@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class SettingController extends Controller
 {
@@ -20,7 +21,6 @@ class SettingController extends Controller
         return $settings;
     }
 
-
     public function update()
     {
         $validator = Validator::make(request()->all(), [
@@ -28,7 +28,9 @@ class SettingController extends Controller
             'app_name' => ['required', 'string'],
             'date_format' => ['required', 'string'],
             'pagination_limit' => ['required', 'integer', 'min:1', 'max:100'],
-            // You can add more validation rules for other fields if needed
+            // Add validation rules for logo and favicon
+            'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'favicon' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
         ]);
 
         // Check if validation fails
@@ -36,8 +38,19 @@ class SettingController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Combine both validated and non-validated fields for processing
-        $settingsData = array_merge(request()->all(), $validator->getData());
+        // Handle file uploads
+        $settingsData = request()->all();
+        if (request()->hasFile('logo')) {
+            $logo = request()->file('logo');
+            $logoPath = $logo->store('logos', 'public');
+            $settingsData['logo'] = $logoPath;
+        }
+
+        if (request()->hasFile('favicon')) {
+            $favicon = request()->file('favicon');
+            $faviconPath = $favicon->store('favicons', 'public');
+            $settingsData['favicon'] = $faviconPath;
+        }
 
         // Process and store settings data
         foreach ($settingsData as $key => $value) {
@@ -52,5 +65,4 @@ class SettingController extends Controller
 
         return response()->json(['success' => true]);
     }
-
 }

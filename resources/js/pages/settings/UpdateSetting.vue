@@ -1,8 +1,10 @@
 <script setup>
 import { onMounted, ref } from "vue";
+import axios from "axios";
 import { useToastr } from "@/toastr";
 
-const settings = ref([]);
+const settings = ref({});
+const errors = ref({});
 const toastr = useToastr();
 
 const getSettings = () => {
@@ -11,12 +13,11 @@ const getSettings = () => {
     });
 };
 
-const errors = ref();
 const updateSettings = () => {
-    errors.value = "";
+    errors.value = {};
     axios
         .post("/api/settings", settings.value)
-        .then((response) => {
+        .then(() => {
             toastr.success("Settings updated successfully!");
         })
         .catch((error) => {
@@ -26,10 +27,37 @@ const updateSettings = () => {
         });
 };
 
+const handleFileChange = (event, key) => {
+    const file = event.target.files[0];
+    if (file) {
+        const formData = new FormData();
+        formData.append(key, file);
+
+        // Append other settings to formData if needed
+        for (const [key, value] of Object.entries(settings.value)) {
+            if (key !== 'logo' && key !== 'favicon') { // exclude file fields if already appended
+                formData.append(key, value);
+            }
+        }
+
+        axios.post("/api/settings", formData)
+            .then((response) => {
+                settings.value[key] = response.data[key];
+                toastr.success("File uploaded successfully!");
+            })
+            .catch((error) => {
+                if (error.response && error.response.status === 422) {
+                    errors.value = error.response.data.errors;
+                }
+            });
+    }
+};
+
 onMounted(() => {
     getSettings();
 });
 </script>
+
 <template>
     <div class="content-header">
         <div class="container-fluid">
@@ -56,6 +84,10 @@ onMounted(() => {
                                 aria-controls="general" aria-selected="true">General</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" id="logo-tab" data-toggle="tab" href="#logo" role="tab"
+                                aria-controls="logo" aria-selected="true">Logo/Favicon</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" id="seo-tab" data-toggle="tab" href="#seo" role="tab"
                                 aria-controls="seo" aria-selected="true">SEO</a>
                         </li>
@@ -74,24 +106,20 @@ onMounted(() => {
                     </ul>
                 </div>
                 <div class="col-9">
-                    <!-- Tab content -->
                     <div class="tab-content" id="myTabContent">
-                        <!-- General settings tab -->
                         <div class="tab-pane fade show active" id="general" role="tabpanel"
                             aria-labelledby="general-tab">
                             <div class="card">
                                 <div class="card-header">
                                     <h3 class="card-title">General Settings</h3>
                                 </div>
-                                <form @submit.prevent="updateSettings()">
+                                <form @submit.prevent="updateSettings">
                                     <div class="card-body">
                                         <div class="form-group">
                                             <label for="appName">App Display Name</label>
                                             <input v-model="settings.app_name" type="text" class="form-control"
                                                 id="appName" placeholder="Enter app display name" />
-                                            <span class="text-danger text-sm" v-if="errors && errors.app_name">{{
-                                                errors.app_name[0]
-                                                }}</span>
+                                            <span class="text-danger text-sm" v-if="errors.app_name">{{ errors.app_name[0] }}</span>
                                         </div>
                                         <div class="form-group">
                                             <label for="dateFormat">Date Format</label>
@@ -99,34 +127,25 @@ onMounted(() => {
                                                 <option value="m/d/Y">MM/DD/YYYY</option>
                                                 <option value="d/m/Y">DD/MM/YYYY</option>
                                                 <option value="Y-m-d">YYYY-MM-DD</option>
-                                                <option value="F j, Y">
-                                                    Month DD, YYYY
-                                                </option>
+                                                <option value="F j, Y">Month DD, YYYY</option>
                                                 <option value="j F Y">DD Month YYYY</option>
                                             </select>
-                                            <span class="text-danger text-sm" v-if="errors && errors.date_format">{{
-                                                errors.date_format[0] }}</span>
+                                            <span class="text-danger text-sm" v-if="errors.date_format">{{ errors.date_format[0] }}</span>
                                         </div>
                                         <div class="form-group">
                                             <label for="websiteMode">Website Mode</label>
                                             <select v-model="settings.website_mode" class="form-control">
                                                 <option value="live">Live</option>
-                                                <option value="maintenance">
-                                                    Maintenance
-                                                </option>
+                                                <option value="maintenance">Maintenance</option>
                                             </select>
-                                            <span class="text-danger text-sm" v-if="errors && errors.website_mode">{{
-                                                errors.website_mode[0] }}</span>
+                                            <span class="text-danger text-sm" v-if="errors.website_mode">{{ errors.website_mode[0] }}</span>
                                         </div>
                                         <div class="form-group">
                                             <label for="paginationLimit">Pagination Limit</label>
                                             <input v-model="settings.pagination_limit" type="number" class="form-control"
                                                 id="paginationLimit" placeholder="Enter pagination limit" />
-                                            <span class="text-danger text-sm"
-                                                v-if="errors && errors.pagination_limit">{{
-                                                    errors.pagination_limit[0] }}</span>
+                                            <span class="text-danger text-sm" v-if="errors.pagination_limit">{{ errors.pagination_limit[0] }}</span>
                                         </div>
-                                        
                                     </div>
                                     <div class="card-footer">
                                         <button type="submit" class="btn btn-primary">
@@ -136,43 +155,31 @@ onMounted(() => {
                                 </form>
                             </div>
                         </div>
-                        <!-- General settings tab -->
-                        <div class="tab-pane fade" id="seo" role="tabpanel"
-                            aria-labelledby="seo-tab">
+                        <div class="tab-pane fade" id="logo" role="tabpanel" aria-labelledby="logo-tab">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title">SEO & Other Settings</h3>
+                                    <h3 class="card-title">Logo & Favicon</h3>
                                 </div>
-                                <form @submit.prevent="updateSettings()">
+                                <form @submit.prevent="updateSettings">
                                     <div class="card-body">
-                                        
                                         <div class="form-group">
-                                            <label for="keywords">Keywords</label>
-                                            <input v-model="settings.keywords" type="text" class="form-control"
-                                                id="keywords" placeholder="Enter keywords" />
-                                            <span class="text-danger text-sm"
-                                                v-if="errors && errors.keywords">{{
-                                                    errors.keywords[0] }}</span>
+                                            <label for="logo">Logo</label>
+                                            <input @change="event => handleFileChange(event, 'logo')" type="file" class="form-control" id="logo" />
+                                            <span class="text-danger text-sm" v-if="errors.logo">{{ errors.logo[0] }}</span>
                                         </div>
                                         <div class="form-group">
-                                            <label for="description">Description</label>
-                                            <input v-model="settings.description" type="text" class="form-control"
-                                                id="description" placeholder="Enter page description" />
-                                            <span class="text-danger text-sm"
-                                                v-if="errors && errors.description">{{
-                                                    errors.description[0] }}</span>
+                                            <label for="favicon">Favicon</label>
+                                            <input @change="event => handleFileChange(event, 'favicon')" type="file" class="form-control" id="favicon" />
+                                            <span class="text-danger text-sm" v-if="errors.favicon">{{ errors.favicon[0] }}</span>
                                         </div>
-                                        <div class="form-group"> 
+                                        <div class="form-group">
                                             <label for="copyright">Copyright</label>
-                                            <input v-model="settings.copyright" type="text" class="form-control"
-                                                id="copyright" placeholder="Enter copyright" />
+                                            <input v-model="settings.copyright" type="text" class="form-control" id="copyright" placeholder="Enter copyright" />
                                         </div>
-                                        <div class="form-group"> 
+                                        <div class="form-group">
                                             <label for="designedBy">Designed By</label>
-                                            <input v-model="settings.designedBy" type="text" class="form-control"
-                                                id="designedBy" placeholder="Enter designer name" />
+                                            <input v-model="settings.designedBy" type="text" class="form-control" id="designedBy" placeholder="Enter designer name" />
                                         </div>
-
                                     </div>
                                     <div class="card-footer">
                                         <button type="submit" class="btn btn-primary">
@@ -182,13 +189,40 @@ onMounted(() => {
                                 </form>
                             </div>
                         </div>
-                        <!-- Contact details tab -->
+                        <div class="tab-pane fade" id="seo" role="tabpanel" aria-labelledby="seo-tab">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">SEO / Meta Settings</h3>
+                                </div>
+                                <form @submit.prevent="updateSettings">
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label for="keywords">Keywords</label>
+                                            <input v-model="settings.keywords" type="text" class="form-control" id="keywords"
+                                                placeholder="Enter keywords" />
+                                            <span class="text-danger text-sm" v-if="errors.keywords">{{ errors.keywords[0] }}</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="description">Meta Description</label>
+                                            <input v-model="settings.meta_description" type="text" class="form-control"
+                                                id="description" placeholder="Enter meta description" />
+                                            <span class="text-danger text-sm" v-if="errors.meta_description">{{ errors.meta_description[0] }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa fa-save mr-1"></i>Save Changes
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                         <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title">Contact Details</h3>
+                                    <h3 class="card-title">Contact Information</h3>
                                 </div>
-                                <form @submit.prevent="updateSettings()">
+                                <form @submit.prevent="updateSettings">
                                     <div class="card-body">
                                         <div class="form-group">
                                             <label for="businessName">Business Name</label>
@@ -225,7 +259,6 @@ onMounted(() => {
                                             <input v-model="settings.email" type="email" class="form-control" id="email"
                                                 placeholder="Enter email" />
                                         </div>
-
                                     </div>
                                     <div class="card-footer">
                                         <button type="submit" class="btn btn-primary">
@@ -235,13 +268,12 @@ onMounted(() => {
                                 </form>
                             </div>
                         </div>
-                        <!-- Social & Other tab -->
                         <div class="tab-pane fade" id="social" role="tabpanel" aria-labelledby="social-tab">
                             <div class="card">
                                 <div class="card-header">
                                     <h3 class="card-title">Social Links & More</h3>
                                 </div>
-                                <form @submit.prevent="updateSettings()">
+                                <form @submit.prevent="updateSettings">
                                     <div class="card-body">
                                         <div class="form-group">
                                             <label for="googleMap">Google Map</label>
@@ -272,13 +304,12 @@ onMounted(() => {
                                 </form>
                             </div>
                         </div>
-                        <!-- SMTP settings tab -->
                         <div class="tab-pane fade" id="smtp" role="tabpanel" aria-labelledby="smtp-tab">
                             <div class="card">
                                 <div class="card-header">
                                     <h3 class="card-title">SMTP Settings</h3>
                                 </div>
-                                <form @submit.prevent="updateSettings()">
+                                <form @submit.prevent="updateSettings">
                                     <div class="card-body">
                                         <div class="form-group">
                                             <label for="smtpHost">SMTP Host</label>
