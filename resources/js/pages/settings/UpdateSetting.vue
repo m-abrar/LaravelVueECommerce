@@ -1,8 +1,6 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useToastr } from "@/toastr";
-import { QuillEditor } from "@vueup/vue-quill";
-import "@vueup/vue-quill/dist/vue-quill.snow.css";
 
 const settings = ref([]);
 const toastr = useToastr();
@@ -32,7 +30,6 @@ onMounted(() => {
     getSettings();
 });
 </script>
-
 <template>
     <div class="content-header">
         <div class="container-fluid">
@@ -165,19 +162,15 @@ onMounted(() => {
                                                 v-if="errors && errors.description">{{
                                                     errors.description[0] }}</span>
                                         </div>
-                                        <div class="form-group">{{ settings.copyright }}
+                                        <div class="form-group"> 
                                             <label for="copyright">Copyright</label>
-                                            <quill-editor v-model="settings.copyright" class="form-control" />
-                                            <span class="text-danger text-sm"
-                                                v-if="errors && errors.copyright">{{
-                                                    errors.copyright[0] }}</span>
+                                            <input v-model="settings.copyright" type="text" class="form-control"
+                                                id="copyright" placeholder="Enter copyright" />
                                         </div>
-                                        <div class="form-group">
+                                        <div class="form-group"> 
                                             <label for="designedBy">Designed By</label>
-                                            <quill-editor v-model="settings.designedBy" class="form-control" />
-                                            <span class="text-danger text-sm"
-                                                v-if="errors && errors.designedBy">{{
-                                                    errors.designedBy[0] }}</span>
+                                            <input v-model="settings.designedBy" type="text" class="form-control"
+                                                id="designedBy" placeholder="Enter designer name" />
                                         </div>
 
                                     </div>
