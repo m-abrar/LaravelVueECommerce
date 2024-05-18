@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Products;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Contracts\Validation\Rule;
+use App\Rules\ExistsOrZero;
 
 class CategoriesController extends Controller
 {
@@ -14,6 +16,14 @@ class CategoriesController extends Controller
     {
         return $categories = Categories::with('parent')->with('children')->orderBy('sort_order')->get();
     }
+
+    
+    public function indexParents()
+    {
+        return $categories = Categories::where('parent_id', 0)->orderBy('sort_order')->get();
+    }
+
+
     public function getTypesWithCount()
     {
         $types = Categories::all();
@@ -91,20 +101,33 @@ class CategoriesController extends Controller
         }
     }
 
+
     public function store(Request $request)
     {
-        $validated = request()->validate([
-            'name' => 'required',
+        $validated = $request->validate([
+            'name' => 'required|unique:categories',
+            'slug' => 'required|alpha_dash|unique:categories',
+            // 'parent_id' => 'nullable|exists:categories,id',
+            // 'parent_id' => 'nullable|exists_or_zero:categories,id',
+            'parent_id' => ['nullable', new ExistsOrZero],
+            'description' => 'nullable',
+            'alt_text' => 'nullable',
+            'meta_title' => 'nullable',
+            'meta_description' => 'nullable',
+            'meta_keywords' => 'nullable',
+            // 'image' => 'nullable', // Assuming image creation is handled separately
         ]);
 
-        Categories::create([
-            'name' => $validated['name'],
-            'parent_id' => $request->parent_id,
-            'description' => $request->description,
-            'image' => $request->image_created,
-        ]);
+
+
+
+        $validated['parent_id'] = $validated['parent_id'] ?? 0;
+
+        $category = Categories::create($validated);
+
         return response()->json(['message' => 'success']);
     }
+
 
     public function edit(Categories $category)
     {
@@ -113,19 +136,25 @@ class CategoriesController extends Controller
 
     public function update(Request $request, Categories $category)
     {
-
-        $validated = request()->validate([
-            'name' => 'required',
+        $validated = $request->validate([
+            'name' => 'required|unique:categories,name,' . $category->id,
+            'slug' => 'required|alpha_dash|unique:categories,slug,' . $category->id,
+            'parent_id' => 'nullable|exists_or_zero:categories,id',
+            'description' => 'nullable',
+            'alt_text' => 'nullable',
+            'meta_title' => 'nullable',
+            'meta_description' => 'nullable',
+            'meta_keywords' => 'nullable',
+            // 'image' => 'nullable', // Assuming image updating is handled separately
         ]);
 
-        $category->update([
-            'name' => $validated['name'],
-            'parent_id' => $request->parent_id,
-            'description' => $request->description,
-        ]);
+        $validated['parent_id'] = $validated['parent_id'] ?? 0;
+
+        $category->update($validated);
 
         return response()->json(['success' => true]);
     }
+
 
     public function uploadImage(Request $request)
     {

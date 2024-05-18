@@ -11,9 +11,10 @@ const route = useRoute();
 const toastr = useToastr();
 const form = reactive({
     name: "",
-    parent_id: null,
+    parent_id: "",
     slug: "",
     description: "",
+    alt_text: "",
     meta_title: "",
     meta_description: "",
     meta_keywords: "",
@@ -24,7 +25,7 @@ const form = reactive({
 const availableCategories = ref([]);
 
 const getAvailableCategories = () => {
-    axios.get("/api/categories").then((response) => {
+    axios.get("/api/categories/parents").then((response) => {
         availableCategories.value = response.data;
     });
 };
@@ -64,10 +65,11 @@ const editCategory = (values, actions) => {
 const getCategory = () => {
     axios.get(`/api/categories/${route.params.id}/edit`).then(({ data }) => {
         form.id = data.id;
-        form.parent_id = data.parent_id;
+        form.parent_id = data.parent_id !== null || data.parent_id !== 0 ? data.parent_id : "0"; 
         form.name = data.name;
         form.slug = data.slug;
         form.description = data.description;
+        form.alt_text = data.alt_text;
         form.meta_title = data.meta_title;
         form.meta_description = data.meta_description;
         form.meta_keywords = data.meta_keywords;
@@ -133,7 +135,7 @@ const handleFileChange = async (event) => {
                             <router-link to="/admin/dashboard">Home</router-link>
                         </li>
                         <li class="breadcrumb-item">
-                            <router-link to="/admin/categories">Category</router-link>
+                            <router-link to="/admin/categories">Categories</router-link>
                         </li>
                         <li class="breadcrumb-item active">
                             <span v-if="editMode">Edit</span>
@@ -179,6 +181,7 @@ const handleFileChange = async (event) => {
                                             <select v-model="form.parent_id" id="parent_id" class="form-control"
                                                 :class="{ 'is-invalid': errors.parent_id }">
                                                 <option value="" disabled>Select Category</option>
+                                                <option value="0">No Parent Category</option> <!-- Option to select no parent category -->
                                                 <!-- Populate options based on categories -->
                                                 <option v-for="category in availableCategories" :value="category.id"
                                                     :key="category.id">{{ category.name }}</option>
@@ -222,20 +225,20 @@ const handleFileChange = async (event) => {
                                     </div>
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label for="meta_title">Meta Tag Title</label>
+                                            <label for="meta_title">Meta Title</label>
                                             <Field v-model="form.meta_title" type="text" class="form-control"
                                                 :class="{ 'is-invalid': errors.meta_title }" id="meta_title"
-                                                placeholder="Enter Meta Tag Title" name="meta_title" />
+                                                placeholder="Enter meta title" name="meta_title" />
                                             <ErrorMessage name="meta_title" class="invalid-feedback" />
                                         </div>
                                     </div>
 
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label for="meta_description">Meta Tag Description</label>
+                                            <label for="meta_description">Meta Description</label>
                                             <Field v-model="form.meta_description" class="form-control" :class="{
                                                 'is-invalid': errors.meta_description,
-                                            }" id="meta_description" rows="3" placeholder="Enter Meta Tag Description"
+                                            }" id="meta_description" rows="3" placeholder="Enter meta description"
                                                 name="meta_description" as="textarea" />
                                             <ErrorMessage name="meta_description" class="invalid-feedback" />
                                         </div>
@@ -243,10 +246,10 @@ const handleFileChange = async (event) => {
 
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label for="meta_keywords">Meta Tag Keywords</label>
+                                            <label for="meta_keywords">Meta Keywords</label>
                                             <Field v-model="form.meta_keywords" class="form-control" :class="{
                                                 'is-invalid': errors.meta_keywords,
-                                            }" id="meta_keywords" rows="3" placeholder="Enter Meta Tag Keywords"
+                                            }" id="meta_keywords" rows="3" placeholder="Enter meta keywords"
                                                 name="meta_keywords" as="textarea" />
                                             <ErrorMessage name="meta_keywords" class="invalid-feedback" />
                                         </div>
