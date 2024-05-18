@@ -12,14 +12,11 @@ class CategoriesController extends Controller
 {
     public function index()
     {
-        // return Categories::all();
-        return Categories::orderBy('sort_order')->get();
+        return $categories = Categories::with('parent')->with('children')->orderBy('sort_order')->get();
     }
     public function getTypesWithCount()
     {
         $types = Categories::all();
-
-        // dd($types);
 
         return collect($types)->map(function ($type) {
             return [
@@ -102,6 +99,7 @@ class CategoriesController extends Controller
 
         Categories::create([
             'name' => $validated['name'],
+            'parent_id' => $request->parent_id,
             'description' => $request->description,
             'image' => $request->image_created,
         ]);
@@ -115,12 +113,14 @@ class CategoriesController extends Controller
 
     public function update(Request $request, Categories $category)
     {
+
         $validated = request()->validate([
             'name' => 'required',
         ]);
 
         $category->update([
             'name' => $validated['name'],
+            'parent_id' => $request->parent_id,
             'description' => $request->description,
         ]);
 

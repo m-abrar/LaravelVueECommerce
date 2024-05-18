@@ -3,7 +3,7 @@ import axios from "axios";
 import { reactive, onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useToastr } from "@/toastr";
-import { Form } from "vee-validate";
+import { Form, Field, ErrorMessage } from "vee-validate";
 import CategoryFormPictures from "./CategoryFormPictures.vue"; // Import the child component
 
 const router = useRouter();
@@ -11,9 +11,23 @@ const route = useRoute();
 const toastr = useToastr();
 const form = reactive({
     name: "",
+    parent_id: null,
+    slug: "",
     description: "",
-    image: null, // For the file input
+    meta_title: "",
+    meta_description: "",
+    meta_keywords: "",
+    is_active: false,
+    image: null,
 });
+
+const availableCategories = ref([]);
+
+const getAvailableCategories = () => {
+    axios.get("/api/categories").then((response) => {
+        availableCategories.value = response.data;
+    });
+};
 
 const handleSubmit = (values, actions) => {
     if (editMode.value) {
@@ -26,7 +40,7 @@ const handleSubmit = (values, actions) => {
 const createCategory = (values, actions) => {
     axios
         .post("/api/categories/create", form)
-        .then((response) => {
+        .then(() => {
             router.push("/admin/categories");
             toastr.success("Category created successfully!");
         })
@@ -38,7 +52,7 @@ const createCategory = (values, actions) => {
 const editCategory = (values, actions) => {
     axios
         .put(`/api/categories/${route.params.id}/edit`, form)
-        .then((response) => {
+        .then(() => {
             router.push("/admin/categories");
             toastr.success("Category updated successfully!");
         })
@@ -49,10 +63,15 @@ const editCategory = (values, actions) => {
 
 const getCategory = () => {
     axios.get(`/api/categories/${route.params.id}/edit`).then(({ data }) => {
-        console.log(data);
         form.id = data.id;
+        form.parent_id = data.parent_id;
         form.name = data.name;
+        form.slug = data.slug;
         form.description = data.description;
+        form.meta_title = data.meta_title;
+        form.meta_description = data.meta_description;
+        form.meta_keywords = data.meta_keywords;
+        form.is_active = data.is_active;
         form.image = data.image;
         form.image_created = null;
     });
@@ -65,6 +84,8 @@ onMounted(() => {
         editMode.value = true;
         getCategory();
     }
+
+    getAvailableCategories();
 });
 
 const fileInput = ref(null);
@@ -86,11 +107,10 @@ const handleFileChange = async (event) => {
     axios
         .post("/api/categories/upload-image", formData)
         .then((response) => {
-            console.log(response);
             form.image_created = response.data.image_created;
             toastr.success("Image uploaded successfully!");
         })
-        .catch((error) => {
+        .catch(() => {
             toastr.error("Image upload failed.");
         });
 };
@@ -110,14 +130,10 @@ const handleFileChange = async (event) => {
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item">
-                            <router-link to="/admin/dashboard"
-                                >Home</router-link
-                            >
+                            <router-link to="/admin/dashboard">Home</router-link>
                         </li>
                         <li class="breadcrumb-item">
-                            <router-link to="/admin/categories"
-                                >Category</router-link
-                            >
+                            <router-link to="/admin/categories">Category</router-link>
                         </li>
                         <li class="breadcrumb-item active">
                             <span v-if="editMode">Edit</span>
@@ -136,162 +152,110 @@ const handleFileChange = async (event) => {
                     <div class="card">
                         <div class="card-body">
                             <Form @submit="handleSubmit" v-slot="{ errors }">
-                                <div class="form-group">
-                                    <label for="name">Name</label>
-                                    <input
-                                        v-model="form.name"
-                                        type="text"
-                                        class="form-control"
-                                        :class="{ 'is-invalid': errors.name }"
-                                        id="name"
-                                        placeholder="Enter Name"
-                                    />
-                                    <span class="invalid-feedback">{{
-                                        errors.name
-                                    }}</span>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="product-type"
-                                        >Parent Category</label
-                                    >
-                                    <!-- You can create a select element for categories here -->
-                                    <select
-                                        v-model="form.category_id"
-                                        id="product-type"
-                                        class="form-control"
-                                        :class="{
-                                            'is-invalid':
-                                                errors.category_id,
-                                        }"
-                                    >
-                                        <option value="" disabled>
-                                            Select Category
-                                        </option>
-                                        <!-- Populate options based on categories -->
-                                        <option
-                                            v-for="category in categories"
-                                            :value="category.id"
-                                            :key="category.id"
-                                        >
-                                            {{ category.name }}
-                                        </option>
-                                    </select>
-                                    <span class="invalid-feedback">{{
-                                        errors.category_id
-                                    }}</span>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="description">Description</label>
-                                    <textarea
-                                        v-model="form.description"
-                                        class="form-control"
-                                        :class="{
-                                            'is-invalid': errors.description,
-                                        }"
-                                        id="description"
-                                        rows="3"
-                                        placeholder="Enter Description"
-                                    ></textarea>
-                                    <span class="invalid-feedback">{{
-                                        errors.description
-                                    }}</span>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="name">Meta Tag Title</label>
-                                    <input
-                                        v-model="form.name"
-                                        type="text"
-                                        class="form-control"
-                                        :class="{ 'is-invalid': errors.name }"
-                                        id="name"
-                                        placeholder="Enter Name"
-                                    />
-                                    <span class="invalid-feedback">{{
-                                        errors.name
-                                    }}</span>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="name"
-                                        >Meta Tag Description</label
-                                    >
-                                    <textarea
-                                        v-model="form.description"
-                                        class="form-control"
-                                        :class="{
-                                            'is-invalid': errors.description,
-                                        }"
-                                        id="description"
-                                        rows="3"
-                                        placeholder="Enter Description"
-                                    ></textarea>
-                                    <span class="invalid-feedback">{{
-                                        errors.name
-                                    }}</span>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="name">Meta Tag Keywords</label>
-                                    <textarea
-                                        v-model="form.description"
-                                        class="form-control"
-                                        :class="{
-                                            'is-invalid': errors.description,
-                                        }"
-                                        id="description"
-                                        rows="3"
-                                        placeholder="Enter Keywords"
-                                    ></textarea>
-                                    <span class="invalid-feedback">{{
-                                        errors.name
-                                    }}</span>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="display_order"
-                                        >Display Order</label
-                                    >
-                                    <input
-                                        v-model="form.display_order"
-                                        type="number"
-                                        class="form-control"
-                                        :class="{
-                                            'is-invalid': errors.display_order,
-                                        }"
-                                        id="display_order"
-                                    />
-                                    <span class="invalid-feedback">{{
-                                        errors.display_order
-                                    }}</span>
-                                </div>
-
-                                <div
-                                    class="col-lg-3 col-md-4 col-sm-6 col-xs-6"
-                                >
-                                    <div class="form-group">
-                                        <div class="form-check">
-                                            <label for="is_active">
-                                                <input
-                                                    v-model="form.is_active"
-                                                    class="form-check-input"
-                                                    type="checkbox"
-                                                    id="is_active"
-                                                />
-                                                Active</label
-                                            >
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="name">Name</label>
+                                            <Field v-model="form.name" type="text" class="form-control"
+                                                :class="{ 'is-invalid': errors.name }" id="name"
+                                                placeholder="Enter Name" name="name" />
+                                            <ErrorMessage name="name" class="invalid-feedback" />
                                         </div>
-                                        <span class="invalid-feedback">{{
-                                            errors.is_active
-                                        }}</span>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="slug">Slug</label>
+                                            <Field v-model="form.slug" type="text" class="form-control"
+                                                :class="{ 'is-invalid': errors.slug }" id="slug"
+                                                placeholder="Enter slug" name="slug" />
+                                            <ErrorMessage name="slug" class="invalid-feedback" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="parent_id">Parent Category</label>
+                                            <select v-model="form.parent_id" id="parent_id" class="form-control"
+                                                :class="{ 'is-invalid': errors.parent_id }">
+                                                <option value="" disabled>Select Category</option>
+                                                <!-- Populate options based on categories -->
+                                                <option v-for="category in availableCategories" :value="category.id"
+                                                    :key="category.id">{{ category.name }}</option>
+                                            </select>
+                                            <ErrorMessage name="parent_id" class="invalid-feedback" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <div class="form-check">
+                                                <label for="is_active">
+                                                    <input v-model="form.is_active" class="form-check-input"
+                                                        type="checkbox" id="is_active" />
+                                                    Active
+                                                </label>
+                                            </div>
+                                            <ErrorMessage name="is_active" class="invalid-feedback" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="description">Description</label>
+                                            <Field v-model="form.description" class="form-control" :class="{
+                                                'is-invalid': errors.description,
+                                            }" id="description" rows="3" placeholder="Enter Description"
+                                                name="description" as="textarea" />
+                                            <ErrorMessage name="description" class="invalid-feedback" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="alt_text">Image Alt Text</label>
+                                            <Field v-model="form.alt_text" type="text" class="form-control"
+                                                :class="{ 'is-invalid': errors.alt_text }" id="alt_text"
+                                                placeholder="Enter Alt Text" name="alt_text" />
+                                            <ErrorMessage name="alt_text" class="invalid-feedback" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="meta_title">Meta Tag Title</label>
+                                            <Field v-model="form.meta_title" type="text" class="form-control"
+                                                :class="{ 'is-invalid': errors.meta_title }" id="meta_title"
+                                                placeholder="Enter Meta Tag Title" name="meta_title" />
+                                            <ErrorMessage name="meta_title" class="invalid-feedback" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="meta_description">Meta Tag Description</label>
+                                            <Field v-model="form.meta_description" class="form-control" :class="{
+                                                'is-invalid': errors.meta_description,
+                                            }" id="meta_description" rows="3" placeholder="Enter Meta Tag Description"
+                                                name="meta_description" as="textarea" />
+                                            <ErrorMessage name="meta_description" class="invalid-feedback" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="meta_keywords">Meta Tag Keywords</label>
+                                            <Field v-model="form.meta_keywords" class="form-control" :class="{
+                                                'is-invalid': errors.meta_keywords,
+                                            }" id="meta_keywords" rows="3" placeholder="Enter Meta Tag Keywords"
+                                                name="meta_keywords" as="textarea" />
+                                            <ErrorMessage name="meta_keywords" class="invalid-feedback" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <button type="submit" class="btn btn-primary">Submit</button>
                                     </div>
                                 </div>
-
-                                <button type="submit" class="btn btn-primary">
-                                    Submit
-                                </button>
                             </Form>
                         </div>
                     </div>
@@ -299,5 +263,5 @@ const handleFileChange = async (event) => {
             </div>
         </div>
     </div>
-    <product-type-form-pictures></product-type-form-pictures>
+    <CategoryFormPictures />
 </template>

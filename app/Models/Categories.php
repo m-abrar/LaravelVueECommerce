@@ -2,11 +2,10 @@
 
 namespace App\Models;
 
-use App\Enums\AppointmentStatus;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Traits\MediaFile;
 
 class Categories extends Model
@@ -18,21 +17,21 @@ class Categories extends Model
      *
      * @var array<int, string>
      */
-    // protected $fillable = [
-    //     'name',
-    //     'image',
-    // ];
-
     protected $guarded = [];
 
-    // protected $appends = ['formatted_start_time', 'formatted_end_time'];
+    // Define the parent relationship
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Categories::class, 'parent_id');
+    }
 
-    protected $casts = [
-    //     'start_time' => 'datetime',
-    //     'end_time' => 'datetime',
-    //     'status' => AppointmentStatus::class,
-    ];
+    // Define the children relationship
+    public function children(): HasMany
+    {
+        return $this->hasMany(Categories::class, 'parent_id');
+    }
 
+    // Example of other relationships or attributes
     // public function client(): BelongsTo
     // {
     //     return $this->belongsTo(Client::class);

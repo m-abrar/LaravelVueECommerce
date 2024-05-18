@@ -39,7 +39,9 @@
                   <tbody ref="sortableList">
                     <tr v-for="(category, index) in categories" :key="category.id">
                       <td>{{ index + 1 }}</td>
-                      <td>{{ category.name }}</td>
+                      <td>
+                        <span v-if="category.parent">{{ category.parent.name }} > </span>{{ category.name }}
+                      </td>
                       <td>
                         <router-link :to="`/admin/categories/${category.id}/edit`">
                           <i class="fa fa-edit mr-2"></i>
