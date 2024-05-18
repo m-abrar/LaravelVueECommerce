@@ -22,6 +22,10 @@ class CategoriesController extends Controller
     {
         return $categories = Categories::where('parent_id', 0)->orderBy('sort_order')->get();
     }
+    public function indexParentsChildren()
+    {
+        return $categories = Categories::where('parent_id', 0)->with('children')->orderBy('sort_order')->get();
+    }
 
 
     public function getTypesWithCount()

@@ -138,7 +138,7 @@ class ProductsController extends Controller
         $products->create($request->except(['attributes','features','lineitems']));
 
         // Use the sync method to update the selected attributes
-        $products->attributes()->sync($request->input('attributes', []));
+        $products->attributevalues()->sync($request->input('attributes', []));
         // Use the sync method to update the selected features
         $products->features()->sync($request->input('features', []));
 
@@ -168,7 +168,7 @@ class ProductsController extends Controller
     public function edit(Products $products)
     {
         // $products->load('services')->load('lineitems')->load('neighbours')->load('rooms')->load('prices')->load('bookings');
-        $products['associated_attributes'] = $products->attributes->pluck('id');
+        $products['associated_attributevalues'] = $products->attributevalues->pluck('id');
         // $products['associated_features'] = $products->features->pluck('id');
         $products['associated_categories'] = $products->categories->pluck('id');
 
@@ -177,6 +177,7 @@ class ProductsController extends Controller
 
     public function update(Request $request, Products $products)
     {
+
         // Define validation rules for specific fields
         $validationRules = [
             'name' => 'required',
@@ -192,10 +193,10 @@ class ProductsController extends Controller
             // 'category_id.required' => 'The category field is required.',
         ]);
         // Update the model with all form fields
-        $products->update($request->except(['attributes','features','categories']));
+        $products->update($request->except(['attributevalues','features','categories']));
 
         // Use the sync method to update the selected attributes
-        $products->attributes()->sync($request->input('attributes', []));
+        $products->attributevalues()->sync($request->input('attributevalues', []));
         // Use the sync method to update the selected features
         // $products->features()->sync($request->input('features', []));
         // Use the sync method to update the selected features

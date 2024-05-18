@@ -46,9 +46,9 @@ class Products extends Model
         return $this->belongsTo(Categories::class, 'category_id');
     }
 
-    public function attributes()
+    public function attributevalues()
     {
-        return $this->belongsToMany(Attributes::class, 'product_attribute_pivot', 'product_id', 'attribute_id');
+        return $this->belongsToMany(AttributeValues::class, 'product_attribute_value_pivot', 'product_id', 'attribute_value_id');
     }
 
     // public function features()

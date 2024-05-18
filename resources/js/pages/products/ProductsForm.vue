@@ -17,7 +17,7 @@ const form = reactive({
     slug: "",
     item_code: "",
     description: "",
-    attributes: [],
+    attributevalues: [],
     price: "",
     category_id: "",
     excerpt: "",
@@ -68,7 +68,7 @@ const editProduct = (values, actions) => {
 const availableCategories = ref([]);
 
 const getAvailableCategories = () => {
-    axios.get("/api/categories").then((response) => {
+    axios.get("/api/categories/parents/children").then((response) => {
         availableCategories.value = response.data;
     });
 };
@@ -88,7 +88,7 @@ const getProduct = () => {
         form.description = data.description;
         form.category_id = data.category_id;
         form.excerpt = data.excerpt;
-        form.attributes = data.associated_attributes;
+        form.attributevalues = data.associated_attributevalues;
         form.features = data.associated_features;
         form.categories = data.associated_categories;
         form.image = data.image;
@@ -119,6 +119,20 @@ onMounted(() => {
     getAvailableAttributes();
     getAvailableCategories();
 });
+
+
+const updateFormAttributes = (valueId) => {
+        // Check if the value is already included in form's attributes
+        const index = form.attributevalues.indexOf(valueId);
+        if (index === -1) {
+            // If not included, add it
+            form.attributevalues.push(valueId);
+        } else {
+            // If included, remove it
+            form.attributevalues.splice(index, 1);
+        }
+
+    };
 </script>
 
 <template>
@@ -209,7 +223,7 @@ onMounted(() => {
                                                         }" id="item_code" placeholder="Enter Item Code" />
                                                     <span class="invalid-feedback">{{
                                                         errors.item_code
-                                                    }}</span>
+                                                        }}</span>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -233,7 +247,7 @@ onMounted(() => {
                                                                 errors.category_id,
                                                         }">
                                                         <option value="" disabled>
-                                                            Select Property Type
+                                                            Select Category
                                                         </option>
                                                         <!-- Populate options based on categories -->
                                                         <option v-for="category in availableCategories"
@@ -243,7 +257,7 @@ onMounted(() => {
                                                     </select>
                                                     <span class="invalid-feedback">{{
                                                         errors.category_id
-                                                    }}</span>
+                                                        }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -260,7 +274,7 @@ onMounted(() => {
                                                     </div>
                                                     <span class="invalid-feedback">{{
                                                         errors.is_active
-                                                    }}</span>
+                                                        }}</span>
                                                 </div>
                                             </div>
 
@@ -275,7 +289,7 @@ onMounted(() => {
                                                     </div>
                                                     <span class="invalid-feedback">{{
                                                         errors.is_featured
-                                                    }}</span>
+                                                        }}</span>
                                                 </div>
                                             </div>
                                             <div class="col-lg-3 col-md-4 col-sm-6 col-xs-6">
@@ -289,7 +303,7 @@ onMounted(() => {
                                                     </div>
                                                     <span class="invalid-feedback">{{
                                                         errors.is_special
-                                                    }}</span>
+                                                        }}</span>
                                                 </div>
                                             </div>
 
@@ -304,7 +318,7 @@ onMounted(() => {
                                                     </div>
                                                     <span class="invalid-feedback">{{
                                                         errors.is_hot
-                                                    }}</span>
+                                                        }}</span>
                                                 </div>
                                             </div>
 
@@ -319,49 +333,41 @@ onMounted(() => {
                                                     </div>
                                                     <span class="invalid-feedback">{{
                                                         errors.is_new
-                                                    }}</span>
+                                                        }}</span>
                                                 </div>
                                             </div>
                                         </div>
-
-
-
                                     </div>
 
-
-                                    
                                     <!-- Categories Tab Pane -->
-<div class="tab-pane" id="categories">
-    <h3 class="text-center">Categories</h3>
-    <div  style="display:flex; justify-content: center;">
-    <div class="col-md-3">
-        <div class="form-group" style="max-height: 500px; overflow-y: auto;">
-            <!-- Iterate over each category -->
-            <template v-for="category in availableCategories" :key="category.id">
-                <!-- Parent category -->
-                <div>
-                    <label class="checkbox-label">
-                        <input type="checkbox" v-model="form.categories" :value="category.id" name="categories[]" />
-                        {{ category.name }}
-                    </label>
-                    <!-- Indent children under their parent -->
-                    <template v-if="category.children && category.children.length > 0">
-                        <div v-for="child in category.children" :key="child.id" class="ml-3">
-                            <label class="checkbox-label">
-                                <input type="checkbox" v-model="form.categories" :value="child.id" name="categories[]" />
-                                {{ child.name }}
-                            </label>
-                        </div>
-                    </template>
-                </div>
-            </template>
-        </div>
-    </div>
-</div>
-</div>
-
-
-
+                                    <div class="tab-pane" id="categories">
+                                        <h3 class="text-center">Categories</h3>
+                                        <div style="display: flex; justify-content: center;">
+                                            <div class="col-md-3">
+                                                <div class="form-group" style="max-height: 500px; overflow-y: auto;">
+                                                    <!-- Iterate over each category -->
+                                                    <template v-for="category in availableCategories" :key="category.id">
+                                                        <!-- Parent category -->
+                                                        <div>
+                                                            <label class="checkbox-label">
+                                                                <input type="checkbox" v-model="form.categories" :value="category.id" name="categories[]" />
+                                                                {{ category.name }}
+                                                            </label>
+                                                            <!-- Indent children under their parent -->
+                                                            <template v-if="category.children && category.children.length > 0">
+                                                                <div v-for="child in category.children" :key="child.id" class="ml-3">
+                                                                    <label class="checkbox-label">
+                                                                        <input type="checkbox" v-model="form.categories" :value="child.id" name="categories[]" />
+                                                                        {{ child.name }}
+                                                                    </label>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
 
                                     <!-- Tab Pan-->
@@ -378,7 +384,7 @@ onMounted(() => {
                                                         }" id="address" placeholder="Enter Product Address" />
                                                     <span class="invalid-feedback">{{
                                                         errors.address
-                                                    }}</span>
+                                                        }}</span>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -392,7 +398,7 @@ onMounted(() => {
                                                         }" id="address" placeholder="Enter Product Address" />
                                                     <span class="invalid-feedback">{{
                                                         errors.address
-                                                    }}</span>
+                                                        }}</span>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -406,7 +412,7 @@ onMounted(() => {
                                                         }" id="address" placeholder="Enter Product Address" />
                                                     <span class="invalid-feedback">{{
                                                         errors.address
-                                                    }}</span>
+                                                        }}</span>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -419,7 +425,7 @@ onMounted(() => {
                                                         }" id="address" placeholder="Enter Product Address" />
                                                     <span class="invalid-feedback">{{
                                                         errors.address
-                                                    }}</span>
+                                                        }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -434,11 +440,10 @@ onMounted(() => {
                                                     <textarea v-model="form.excerpt" class="form-control" :class="{
                                                         'is-invalid':
                                                             errors.excerpt,
-                                                    }" id="excerpt" rows="3"
-                                                        placeholder="Enter Excerpt"></textarea>
+                                                    }" id="excerpt" rows="3" placeholder="Enter Excerpt"></textarea>
                                                     <span class="invalid-feedback">{{
                                                         errors.excerpt
-                                                    }}</span>
+                                                        }}</span>
                                                 </div>
                                             </div>
                                             <div class="col-md-12">
@@ -452,7 +457,7 @@ onMounted(() => {
                                                         placeholder="Enter product description here..."></textarea>
                                                     <span class="invalid-feedback">{{
                                                         errors.description
-                                                    }}</span>
+                                                        }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -463,7 +468,7 @@ onMounted(() => {
                                         <h5 class="text-center mb-3">
                                             Attributes
                                         </h5>
-                                        <div class="row">
+                                        <div class="row"> 
                                             <div class="col-lg-12">
                                                 <div class="form-group">
                                                     <template v-for="attribute in availableAttributes">
@@ -471,35 +476,21 @@ onMounted(() => {
                                                             <div class="row">
                                                                 <div class="col-md-3">
                                                                     <h5>
-                                                                        {{
-                                                                            attribute.name
-                                                                        }}
+                                                                        {{ attribute.name }}
                                                                     </h5>
                                                                 </div>
                                                                 <div class="col-md-9">
                                                                     <!-- Iterate through attribute values -->
-                                                                    <div v-if="
-                                                                        attribute.display_type ===
-                                                                        'checkbox'
-                                                                    " v-for="value in attribute.attribute_values">
+                                                                    <div v-if="attribute.display_type === 'checkbox'" v-for="value in attribute.attribute_values">
                                                                         <label class="checkbox-label">
-                                                                            <input type="checkbox"
-                                                                                name="attribute_values[]" />
-                                                                            {{
-                                                                                value.name
-                                                                            }}
+                                                                            <input type="checkbox" :name="`attribute_${attribute.id}`" :value="value.id" :checked="form.attributevalues.includes(value.id)" @change="updateFormAttributes(value.id)" />
+                                                                            {{ value.name }}
                                                                         </label>
                                                                     </div>
-                                                                    <div v-else-if="
-                                                                        attribute.display_type ===
-                                                                        'radio'
-                                                                    " v-for="value in attribute.attribute_values">
+                                                                    <div v-else-if="attribute.display_type === 'radio'" v-for="value in attribute.attribute_values">
                                                                         <label class="radio-label">
-                                                                            <input type="radio"
-                                                                                name="attribute_values[]" />
-                                                                            {{
-                                                                                value.name
-                                                                            }}
+                                                                            <input type="radio" :name="`attribute_${attribute.id}`" :value="value.id" :checked="form.attributevalues.includes(value.id)" @change="updateFormAttributes(value.id)" />
+                                                                            {{ value.name }}
                                                                         </label>
                                                                     </div>
                                                                 </div>
