@@ -158,6 +158,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/api/categories/{category}/edit', [CategoriesController::class, 'update']);
     Route::delete('/api/categories/{category}', [CategoriesController::class, 'destroy']);
     Route::post('/api/categories/upload-image', [CategoriesController::class, 'uploadImage']);
+    Route::post('/api/categories/upload-banner', [CategoriesController::class, 'uploadBanner']);
     Route::post('/api/categories/update-sort-order', [CategoriesController::class, 'updateSortOrder']);
 
     Route::get('/api/products', [ProductsController::class, 'index']);

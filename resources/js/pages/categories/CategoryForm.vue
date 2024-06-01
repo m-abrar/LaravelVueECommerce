@@ -4,7 +4,7 @@ import { reactive, onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useToastr } from "@/toastr";
 import { Form, Field, ErrorMessage } from "vee-validate";
-import CategoryFormPictures from "./CategoryFormPictures.vue"; // Import the child component
+import CategoryFormPictures from "./CategoryFormPictures.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -20,8 +20,8 @@ const form = reactive({
     meta_keywords: "",
     is_active: false,
     image: null,
+    banner: null, // Added banner field
 });
-
 const availableCategories = ref([]);
 
 const getAvailableCategories = () => {
@@ -64,6 +64,7 @@ const editCategory = (values, actions) => {
 
 const getCategory = () => {
     axios.get(`/api/categories/${route.params.id}/edit`).then(({ data }) => {
+        // Set form fields with retrieved data
         form.id = data.id;
         form.parent_id = data.parent_id !== null || data.parent_id !== 0 ? data.parent_id : "0"; 
         form.name = data.name;
@@ -75,7 +76,7 @@ const getCategory = () => {
         form.meta_keywords = data.meta_keywords;
         form.is_active = data.is_active;
         form.image = data.image;
-        form.image_created = null;
+        form.banner = data.banner; // Set banner field
     });
 };
 
@@ -90,32 +91,40 @@ onMounted(() => {
     getAvailableCategories();
 });
 
-const fileInput = ref(null);
-
-const openFileInput = () => {
-    fileInput.value.click();
-};
-
-const handleFileChange = async (event) => {
+const handleImageChange = async (event) => {
     const file = event.target.files[0];
-    form.image = URL.createObjectURL(file); // Set the file directly in your reactive form
+    form.image = URL.createObjectURL(file); 
 
-    // Create a FormData object and append the file to it
     const formData = new FormData();
     formData.append("image", file);
     formData.append("id", form.id);
 
-    // Send the FormData to your server for processing
-    axios
-        .post("/api/categories/upload-image", formData)
-        .then((response) => {
-            form.image_created = response.data.image_created;
-            toastr.success("Image uploaded successfully!");
-        })
-        .catch(() => {
-            toastr.error("Image upload failed.");
-        });
+    try {
+        const response = await axios.post("/api/categories/upload-image", formData);
+        form.image_created = response.data.image_created;
+        toastr.success("Image uploaded successfully!");
+    } catch (error) {
+        toastr.error("Image upload failed.");
+    }
 };
+
+const handleBannerChange = async (event) => {
+    const file = event.target.files[0];
+    form.banner = URL.createObjectURL(file); 
+
+    const formData = new FormData();
+    formData.append("banner", file);
+    formData.append("id", form.id);
+
+    try {
+        const response = await axios.post("/api/categories/upload-banner", formData);
+        form.banner_created = response.data.banner_created;
+        toastr.success("Banner uploaded successfully!");
+    } catch (error) {
+        toastr.error("Banner upload failed.");
+    }
+};
+
 </script>
 
 <template>
@@ -252,6 +261,20 @@ const handleFileChange = async (event) => {
                                             }" id="meta_keywords" rows="3" placeholder="Enter meta keywords"
                                                 name="meta_keywords" as="textarea" />
                                             <ErrorMessage name="meta_keywords" class="invalid-feedback" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                        <label for="image">Image</label>
+                                        <input type="file" @change="handleImageChange" class="form-control-file" id="image" name="image">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                        <label for="banner">Banner</label>
+                                        <input type="file" @change="handleBannerChange" class="form-control-file" id="banner" name="banner">
                                         </div>
                                     </div>
 

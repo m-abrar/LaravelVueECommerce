@@ -14,19 +14,18 @@ class CategoriesController extends Controller
 {
     public function index()
     {
-        return $categories = Categories::with('parent')->with('children')->orderBy('sort_order')->get();
+        return Categories::with('parent')->with('children')->orderBy('sort_order')->get();
     }
 
-    
     public function indexParents()
     {
-        return $categories = Categories::where('parent_id', 0)->orderBy('sort_order')->get();
-    }
-    public function indexParentsChildren()
-    {
-        return $categories = Categories::where('parent_id', 0)->with('children')->orderBy('sort_order')->get();
+        return Categories::where('parent_id', 0)->orderBy('sort_order')->get();
     }
 
+    public function indexParentsChildren()
+    {
+        return Categories::where('parent_id', 0)->with('children')->orderBy('sort_order')->get();
+    }
 
     public function getTypesWithCount()
     {
@@ -37,11 +36,10 @@ class CategoriesController extends Controller
                 'id' => $type->id,
                 'name' => $type->name,
                 'count' => Products::where('category_id', $type->id)->count(),
-                'color' => 'success', //Category::from($status->value)->color(),
+                'color' => 'success',
             ];
         });
     }
-    
 
     public function getAllMedia($service_id)
     {
@@ -52,14 +50,10 @@ class CategoriesController extends Controller
             ->latest()
             ->first();
         if ($featuredMediaFile) {
-            // Check if $featuredMediaFile is not null
             $featuredMediaFile->url = $featuredMediaFile->getUrl();
         }
 
-        // Retrieve all media for the service
         $mediaFiles = $service->mediaFiles()->orderBy('display_order', 'ASC')->get();
-
-        // Iterate through media files and set URLs
         $mediaFiles->each(function ($mediaItem) {
             $mediaItem->url = $mediaItem->getUrl();
         });
@@ -95,43 +89,43 @@ class CategoriesController extends Controller
         $existingMedia = $service->mediaFiles()->find($media_id);
 
         if ($existingMedia) {
-            // The media_id is already attached, so detach it
-            $response = $service->mediaFiles()->detach($media_id, ['model_type' => get_class($service)]);
+            $service->mediaFiles()->detach($media_id, ['model_type' => get_class($service)]);
             return 'removed';
         } else {
-            // The media_id is not attached, so attach it
-            $response = $service->mediaFiles()->attach($media_id, ['model_type' => get_class($service)]);
+            $service->mediaFiles()->attach($media_id, ['model_type' => get_class($service)]);
             return 'attached';
         }
     }
-
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|unique:categories',
             'slug' => 'required|alpha_dash|unique:categories',
-            // 'parent_id' => 'nullable|exists:categories,id',
-            // 'parent_id' => 'nullable|exists_or_zero:categories,id',
             'parent_id' => ['nullable', new ExistsOrZero],
             'description' => 'nullable',
             'alt_text' => 'nullable',
             'meta_title' => 'nullable',
             'meta_description' => 'nullable',
             'meta_keywords' => 'nullable',
-            // 'image' => 'nullable', // Assuming image creation is handled separately
+            // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            // 'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-
-
-
         $validated['parent_id'] = $validated['parent_id'] ?? 0;
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = Storage::disk('public')->put('/images', $request->file('image'));
+        }
+
+        if ($request->hasFile('banner')) {
+            $validated['banner'] = Storage::disk('public')->put('/banners', $request->file('banner'));
+        }
 
         $category = Categories::create($validated);
 
         return response()->json(['message' => 'success']);
     }
-
 
     public function edit(Categories $category)
     {
@@ -143,40 +137,56 @@ class CategoriesController extends Controller
         $validated = $request->validate([
             'name' => 'required|unique:categories,name,' . $category->id,
             'slug' => 'required|alpha_dash|unique:categories,slug,' . $category->id,
-            'parent_id' => 'nullable|exists_or_zero:categories,id',
+            'parent_id' => ['nullable', new ExistsOrZero],
             'description' => 'nullable',
             'alt_text' => 'nullable',
             'meta_title' => 'nullable',
             'meta_description' => 'nullable',
             'meta_keywords' => 'nullable',
-            // 'image' => 'nullable', // Assuming image updating is handled separately
+            // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            // 'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $validated['parent_id'] = $validated['parent_id'] ?? 0;
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = Storage::disk('public')->put('/images', $request->file('image'));
+        }
+
+        if ($request->hasFile('banner')) {
+            $validated['banner'] = Storage::disk('public')->put('/banners', $request->file('banner'));
+        }
 
         $category->update($validated);
 
         return response()->json(['success' => true]);
     }
 
-
     public function uploadImage(Request $request)
     {
-        // Validate the uploaded file
         $request->validate([
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust the validation rules as needed
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($request->file('image')) {
             $link = Storage::disk('public')->put('/images', $request->file('image'));
-
-            // // $file = $request->file('image');
-            // // $filename = $file->getClientOriginalName(); // Use the original filename or generate a unique one
-            // Store the image in the 'public' disk under the 'images' directory
-            // // Storage::disk('public')->put('images/' . $filename, file_get_contents($file));
-            // You can save the image file path in your database if needed
             Categories::where('id', $request->id)->update(['image' => $link]);
             return response()->json(['success' => true, 'image_created' => $link]);
+        } else {
+            return response()->json(['success' => false, 'message' => 'No file uploaded.']);
+        }
+    }
+
+    public function uploadBanner(Request $request)
+    {
+        $request->validate([
+            'banner' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($request->file('banner')) {
+            $link = Storage::disk('public')->put('/banners', $request->file('banner'));
+            Categories::where('id', $request->id)->update(['banner' => $link]);
+            return response()->json(['success' => true, 'banner_created' => $link]);
         } else {
             return response()->json(['success' => false, 'message' => 'No file uploaded.']);
         }

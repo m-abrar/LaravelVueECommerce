@@ -88,82 +88,25 @@ class ProductsController extends Controller
 
 
 
-    public function test($id)
+    public function store(Request $request)
     {
-        $ids = [8,9,10];
-        
-        // $mediaFiles = MediaFile::find($ids);
-
-        $location = Locations::findOrFail($id);
-        $response = $location->mediaFiles()->detach($ids, ['model_type' => get_class($location)]);
-        $response = $location->mediaFiles()->attach($ids, ['model_type' => get_class($location), 'is_featured' => true]);
-
-        $mediaFiles = $location->mediaFile; //Trait Function
-
-        $mediaFiles = $location->mediaFiles()
-                            ->wherePivot('is_featured', true)
-                            ->get();
-
-
-        echo $mediaFilesFeaturedURL = $location->featuredMediaFileURL();
-        echo 'featured<br/>';
-
-
-        foreach ($mediaFiles as $mediaItem) {
-            $url = $location->mediaFileURL($mediaItem->id);
-            echo $url . '<br>';
-        }
-
-
-        dd($mediaFiles);
-    }
-
-    public function store(Request $request, Products $products)
-    {
-        // Define validation rules for specific fields
-        $validationRules = [
+        $validatedData = $request->validate([
             'name' => 'required',
             'item_code' => 'required',
             'slug' => 'required',
-            // 'category_id' => 'required',
             'excerpt' => 'required',
             'description' => 'required',
-        ];
-
-        // Validate the specific fields
-        $request->validate($validationRules, [
-            'category_id.required' => 'The category field is required.',
+            'category_id' => 'required', // Ensure category_id is required
         ]);
-        // Update the model with all form fields
-        $products->create($request->except(['attributes','features','lineitems']));
 
-        // Use the sync method to update the selected attributes
-        $products->attributevalues()->sync($request->input('attributes', []));
-        // Use the sync method to update the selected features
-        $products->features()->sync($request->input('features', []));
+        $product = Products::create($validatedData);
 
-
-        // Handle lineitems if provided
-        if (isset($request['lineitems'])) {
-            // Create and associate line items
-            $lineItems = [];
-            foreach ($request['lineitems'] as $lineitem) {
-                $lineItems[] = new ProductLineItem([
-                    'name' => $lineitem['name'],
-                    'value' => $lineitem['value'],
-                    'value_type' => $lineitem['value_type'],
-                    'apply_on' => $lineitem['apply_on'],
-                    'is_required' => $lineitem['is_required'],
-                    'image' => $lineitem['image'],
-                    'display_order' => $lineitem['display_order'],
-                ]);
-            }
-
-            $product->lineitems()->saveMany($lineItems);
-        }
+        $product->attributevalues()->sync($request->input('attributevalues', []));
+        $product->categories()->sync($request->input('categories', []));
 
         return response()->json(['message' => 'success']);
     }
+
 
     public function edit(Products $products)
     {
